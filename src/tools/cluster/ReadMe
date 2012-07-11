@@ -1,0 +1,18 @@
+This is the cluster utilities. Right now, this tool is check_disk util.
+
+check_disk.sh
+This script check the copys of a broken disk data. if the
+disk still can server, then blocks which only have one copys
+will record to a file. if not, blocks which have no copys
+will copy from slave cluster.
+
+This script need four other tools: blocktool, showssm, tfstool
+and syncfile. They should be in the same diretory.
+
+Usage: ./check_disk.sh source_ns_ip dest_ns_ip ds_ip [file_name] 
+
+        source_ns_ip: the cluster ns ip of broken disk 
+        dest_ns_ip:   peer cluster ns ip 
+        filename:     block list to be sync, default 'tmp', optional.
+
+

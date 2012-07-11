@@ -1,0 +1,217 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE beans PUBLIC "-//SPRING//DTD BEAN//EN" "http://www.springframework.org/dtd/spring-beans.dtd">
+<beans default-autowire="byName">
+
+	<bean id="dataServer1" class="com.taobao.gaia.AppServer">
+		<property name="ip" value="10.232.4.11"/>
+		<property name="pid" value="-1"/>
+		<property name="port" value="3202"/>
+		<property name="confname" value="/conf/tfs.conf" />
+		<property name="logs" value="/logs/dataserver_1.log" />
+		<property name="dir" value="/home/admin/tfs" />
+		<property name="startcmd" value="/home/admin/tfs/lib/dataserver -f /home/admin/tfs/conf/tfs.conf -d -i 1" />
+		<property name="stopcmd" value="" />
+		<property name="cleancmd">
+			<list>
+				<value>rm -rf /home/admin/tfs/logs/*</value>
+				<value>cd /home/admin/tfs/tools; sh stfs.sh clear 1; sh stfs.sh format 1</value>
+			</list>
+		</property>
+	</bean>
+	
+	<bean id="dataServer2" class="com.taobao.gaia.AppServer">
+		<property name="ip" value="10.232.4.11"/>
+		<property name="pid" value="-1"/>
+		<property name="port" value="3204"/>
+		<property name="confname" value="/conf/tfs.conf" />
+		<property name="logs" value="/logs/dataserver_2.log" />
+		<property name="dir" value="/home/admin/tfs" />
+		<property name="startcmd" value="/home/admin/tfs/lib/dataserver -f /home/admin/tfs/conf/tfs.conf -d -i 2" />
+		<property name="stopcmd" value="" />
+		<property name="cleancmd">
+			<list>
+				<value>rm -rf /home/admin/tfs/logs/*</value>
+				<value>cd /home/admin/tfs/tools; sh stfs.sh clear 2; sh stfs.sh format 2</value>
+			</list>
+		</property>
+	</bean>
+
+	<bean id="dataServer3" class="com.taobao.gaia.AppServer">
+		<property name="ip" value="10.232.4.11"/>
+		<property name="pid" value="-1"/>
+		<property name="port" value="3206"/>
+		<property name="confname" value="/conf/tfs.conf" />
+		<property name="logs" value="/logs/dataserver_3.log" />
+		<property name="dir" value="/home/admin/tfs" />
+		<property name="startcmd" value="/home/admin/tfs/lib/dataserver -f /home/admin/tfs/conf/tfs.conf -d -i 3" />
+		<property name="stopcmd" value="" />
+		<property name="cleancmd">
+			<list>
+				<value>rm -rf /home/admin/tfs/logs/*</value>
+				<value>cd /home/admin/tfs/tools; sh stfs.sh clear 3; sh stfs.sh format 3</value>
+			</list>
+		</property>
+	</bean>
+	
+	<bean id="dataServer4" class="com.taobao.gaia.AppServer">
+		<property name="ip" value="10.232.4.11"/>
+		<property name="pid" value="-1"/>
+		<property name="port" value="3208"/>
+		<property name="confname" value="/conf/tfs.conf" />
+		<property name="logs" value="/logs/dataserver_4.log" />
+		<property name="dir" value="/home/admin/tfs" />
+		<property name="startcmd" value="/home/admin/tfs/lib/dataserver -f /home/admin/tfs/conf/tfs.conf -d -i 4" />
+		<property name="stopcmd" value="" />
+		<property name="cleancmd">
+			<list>
+				<value>rm -rf /home/admin/tfs/logs/*</value>
+				<value>cd /home/admin/tfs/tools; sh stfs.sh clear 4; sh stfs.sh format 4</value>
+			</list>
+		</property>
+	</bean>
+	
+	<bean id="dataServer5" class="com.taobao.gaia.AppServer">
+		<property name="ip" value="10.232.4.12"/>
+		<property name="pid" value="-1"/>
+		<property name="port" value="3202"/>
+		<property name="confname" value="/conf/tfs.conf" />
+		<property name="logs" value="/logs/dataserver_1.log" />
+		<property name="dir" value="/home/admin/tfs" />
+		<property name="startcmd" value="/home/admin/tfs/lib/dataserver -f /home/admin/tfs/conf/tfs.conf -d -i 1" />
+		<property name="stopcmd" value="" />
+		<property name="cleancmd">
+			<list>
+				<value>rm -rf /home/admin/tfs/logs/*</value>
+				<value>cd /home/admin/tfs/tools; sh stfs.sh clear 1; sh stfs.sh format 1</value>
+			</list>
+		</property>
+	</bean>
+	
+	<bean id="dataServer6" class="com.taobao.gaia.AppServer">
+		<property name="ip" value="10.232.4.12"/>
+		<property name="pid" value="-1"/>
+		<property name="port" value="3204"/>
+		<property name="confname" value="/conf/tfs.conf" />
+		<property name="logs" value="/logs/dataserver_2.log" />
+		<property name="dir" value="/home/admin/tfs" />
+		<property name="startcmd" value="/home/admin/tfs/lib/dataserver -f /home/admin/tfs/conf/tfs.conf -d -i 2" />
+		<property name="stopcmd" value="" />
+		<property name="cleancmd">
+			<list>
+				<value>rm -rf /home/admin/tfs/logs/*</value>
+				<value>cd /home/admin/tfs/tools; sh stfs.sh clear 2; sh stfs.sh format 2</value>
+			</list>
+		</property>
+	</bean>
+
+	<bean id="dataServer7" class="com.taobao.gaia.AppServer">
+		<property name="ip" value="10.232.4.12"/>
+		<property name="pid" value="-1"/>
+		<property name="port" value="3206"/>
+		<property name="confname" value="/conf/tfs.conf" />
+		<property name="logs" value="/logs/dataserver_3.log" />
+		<property name="dir" value="/home/admin/tfs" />
+		<property name="startcmd" value="/home/admin/tfs/lib/dataserver -f /home/admin/tfs/conf/tfs.conf -d -i 3" />
+		<property name="stopcmd" value="" />
+		<property name="cleancmd">
+			<list>
+				<value>rm -rf /home/admin/tfs/logs/*</value>
+				<value>cd /home/admin/tfs/tools; sh stfs.sh clear 3; sh stfs.sh format 3</value>
+			</list>
+		</property>
+	</bean>
+	
+	<bean id="dataServer8" class="com.taobao.gaia.AppServer">
+		<property name="ip" value="10.232.4.12"/>
+		<property name="pid" value="-1"/>
+		<property name="port" value="3208"/>
+		<property name="confname" value="/conf/tfs.conf" />
+		<property name="logs" value="/logs/dataserver_4.log" />
+		<property name="dir" value="/home/admin/tfs" />
+		<property name="startcmd" value="/home/admin/tfs/lib/dataserver -f /home/admin/tfs/conf/tfs.conf -d -i 4" />
+		<property name="stopcmd" value="" />
+		<property name="cleancmd">
+			<list>
+				<value>rm -rf /home/admin/tfs/logs/*</value>
+				<value>cd /home/admin/tfs/tools; sh stfs.sh clear 4; sh stfs.sh format 4</value>
+			</list>
+		</property>
+	</bean>
+
+  <bean id="dataServerCluster" class="com.taobao.gaia.AppCluster">
+		<property name="name" value="dataServerCluster"/>
+		<property name="serverList">
+			<list>
+				<ref bean="dataServer1" />
+				<ref bean="dataServer2" />
+				<ref bean="dataServer3" />
+				<ref bean="dataServer4" />
+				<ref bean="dataServer5" />
+				<ref bean="dataServer6" />
+				<ref bean="dataServer7" />
+				<ref bean="dataServer8" />
+			</list>
+		</property>
+	</bean>
+
+	<bean id="nameServer1" class="com.taobao.gaia.AppServer">
+		<property name="ip" value="10.232.4.11"/>
+		<property name="pid" value="-1"/>
+		<property name="port" value="3100"/>
+		<property name="confname" value="/home/admin/tfs/conf/tfs.conf" />
+		<property name="logs" value="/home/admin/tfs/logs/nameserver.log" />
+		<property name="dir" value="/home/admin/tfs" />
+		<property name="vip" value="10.232.4.232" />
+		<property name="macName" value="tfs004011.sqa.cm4" />
+		<property name="resName" value="tfs-name-server" />
+		<property name="ipAlias" value="ip-alias" />
+		<property name="startcmd" value="/home/admin/tfs/lib/nameserver -f /home/admin/tfs/conf/tfs.conf -d" />
+		<property name="stopcmd" value="" />
+		<property name="cleancmd">
+			<list>
+				<value>rm -rf /home/admin/tfs/logs/*</value>
+			</list>
+		</property>
+	</bean>
+
+	<bean id="nameServer2" class="com.taobao.gaia.AppServer">
+		<property name="ip" value="10.232.4.12"/>
+		<property name="pid" value="-1"/>
+		<property name="port" value="3100"/>
+		<property name="confname" value="/home/admin/tfs/conf/tfs.conf" />
+		<property name="logs" value="/home/admin/tfs/logs/nameserver.log" />
+		<property name="dir" value="/home/admin/tfs" />
+		<property name="vip" value="10.232.4.232" />
+		<property name="macName" value="tfs004012.sqa.cm4" />
+		<property name="resName" value="tfs-name-server" />
+		<property name="ipAlias" value="ip-alias" />
+		<property name="startcmd" value="/home/admin/tfs/lib/nameserver -f /home/admin/tfs/conf/tfs.conf -d" />
+		<property name="stopcmd" value="" />
+		<property name="cleancmd">
+			<list>
+				<value>rm -rf /home/admin/tfs/logs/*</value>
+			</list>
+		</property>
+	</bean>
+
+	<bean id="nameServerCluster" class="com.taobao.gaia.AppCluster">
+		<property name="name" value="nameServerCluster"/>
+		<property name="serverList">
+			<list>
+				<ref bean="nameServer1" />
+				<ref bean="nameServer2" />
+			</list>
+		</property>
+	</bean>
+
+	<bean id="tfsGrid" class="com.taobao.gaia.AppGrid">
+		<property name="name" value="tfsGrid"/>
+		<property name="clusterList">
+			<list>
+				<ref bean="nameServerCluster" />
+				<ref bean="dataServerCluster" />
+			</list>
+		</property>
+	</bean>
+
+</beans>

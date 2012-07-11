@@ -1,0 +1,34 @@
+<resources>
+  <group id="ns-group">
+    <primitive class="ocf" id="ip-alias" provider="heartbeat" type="IPaddr2">
+      <instance_attributes id="ip-alias-instance_attributes">
+        <nvpair id="ip-alias-instance_attributes-ip" name="ip" value="192.168.208.230"/>
+        <nvpair id="ip-alias-instance_attributes-nic" name="nic" value="bond0:0"/>
+      </instance_attributes>
+      <operations>
+        <op id="ip-alias-monitor-2s" interval="2s" name="monitor"/>
+      </operations>
+      <meta_attributes id="ip-alias-meta_attributes">
+        <nvpair id="ip-alias-meta_attributes-target-role" name="target-role" value="Started"/>
+      </meta_attributes>
+    </primitive>
+    <primitive class="ocf" id="tfs-name-server" provider="heartbeat" type="NameServer">
+      <instance_attributes id="tfs-name-server-instance_attributes">
+        <nvpair id="tfs-name-server-instance_attributes-basedir" name="basedir" value="/home/admin/tfs"/>
+        <nvpair id="tfs-name-server-instance_attributes-nsip" name="nsip" value="localhost"/>
+        <nvpair id="tfs-name-server-instance_attributes-nsport" name="nsport" value="3100"/>
+        <nvpair id="tfs-name-server-instance_attributes-user" name="user" value="admin"/>
+      </instance_attributes>
+      <operations>
+        <op id="tfs-name-nameserver-monitor-2s" interval="2s" name="monitor"/>
+        <op id="tfs-name-nameserver-start" interval="0s" name="start" timeout="30s"/>
+        <op id="tfs-name-nameserver-stop" interval="0s" name="stop" timeout="30s"/>
+      </operations>
+      <meta_attributes id="tfs-name-server-meta_attributes">
+        <nvpair id="tfs-name-server-meta_attributes-target-role" name="target-role" value="Started"/>
+        <nvpair id="tfs-name-server-meta_attributes-resource-stickiness" name="resource-stickiness" value="INFINITY"/>
+        <nvpair id="tfs-name-server-meta_attributes-resource-failure-stickiness" name="resource-failure-stickiness" value="-INFINITY"/>
+      </meta_attributes>
+    </primitive>
+  </group>
+</resources>

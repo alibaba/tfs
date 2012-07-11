@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE beans PUBLIC "-//SPRING//DTD BEAN//EN" "http://www.springframework.org/dtd/spring-beans.dtd">
+<beans default-autowire="byName">
+	
+    <bean id="seedClient" class="com.taobao.gaia.AppServer">
+        <property name="ip" value="10.232.4.11"/>
+       	<property name="pid" value="-1"/>
+       	<property name="confname" value="/home/admin/tfstest_new/tfstestapi.conf" />
+       	<property name="dir" value="/home/admin/tfstest_new/" />
+       	<property name="logs" value="/home/admin/tfstest_new/tfsSeed.log" />
+        <property name="isBackground" value="true" />
+		<property name="startcmd">
+		<value>/home/admin/tfstest_new/tfsControlPress -f /home/admin/tfstest_new/tfstestapi.conf -i tfsSeed -l /home/admin/tfstest_new/tfsSeed.log</value>
+		</property>
+		<property name="stopcmd" value="killall tfsControlPress" />
+		<property name="cleancmd">
+			<list>
+				<value>rm -rf *.log *.txt</value>
+			</list>
+		</property>
+    </bean>
+    
+    <bean id="readClient" class="com.taobao.gaia.AppServer">
+        <property name="ip" value="10.232.4.11"/>
+       	<property name="pid" value="-1"/>
+       	<property name="confname" value="/home/admin/tfstest_large/tfstestapi.conf" />
+       	<property name="dir" value="/home/admin/tfstest_large/" />
+       	<property name="logs" value="/home/admin/tfstest_new/tfsRead.log" />
+       	<property name="isBackground" value="true" />
+		<property name="startcmd">
+		<value>/home/admin/tfstest_large/tfsControlPress -f /home/admin/tfstest_large/tfstestapi.conf -i tfsRead -l /home/admin/tfstest_large/tfsRead.log</value>
+		</property>
+		<property name="stopcmd" value="killall tfsControlPress" />
+		<property name="cleancmd">
+			<list>
+				<value>rm -rf *.log *.txt</value>
+			</list>
+		</property>
+    </bean>
+
+</beans>

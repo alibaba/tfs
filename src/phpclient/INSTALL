@@ -1,0 +1,9 @@
+1. install tfs_client.so extension_dir
+2. cp tfs.conf php_source_dir 
+3. Modify php.ini: ADD two items
+==============================================
+extension = tfs_client.so
+extension_dir = "your extension module dir"
+==============================================
+
+examples: test/phpclient

@@ -1,0 +1,24 @@
+configure ha nameserver with heartbeat3
+
+1. configure heartbeat 3, set node, (ha.cf), start heartbeat service.
+    
+
+
+2. copy NameServer to ${OCF_ROOT}/resource.d/heartbet
+
+
+
+3. configure heartbeat crm resources.
+    cibadmin --replace --obj_type=resources --xml-file ./cibrsc.xml
+
+    notice: change the IPAddr2 parameter "ip" to your vip address.
+    notice: NameServer and IPAddr2 must in one group
+
+
+4. set default property "symmetric-cluster" to "true"
+    crm_attribute --type crm_config --attr-name symmetric-cluster --attr-value true
+
+5. set all nodes online. switch standby mode off.
+
+6. set default resouce stickness
+    crm_attribute --type rsc_defaults --name resource-stickiness --update 100

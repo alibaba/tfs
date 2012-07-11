@@ -1,0 +1,19 @@
+debugfile /var/log/ha-debug
+debug 1
+keepalive 2
+warntime 5
+deadtime 10
+initdead 30
+auto_failback off
+autojoin none
+#bcast eth2
+bcast eth1
+#bcast eth3
+mcast bond0 225.0.0.5 694 1 0
+udpport 694
+node tfs036097.sqa.cm4 
+node tfs035041.sqa.cm4 
+compression bz2
+logfile /var/log/ha-log
+logfacility     local0
+crm respawn

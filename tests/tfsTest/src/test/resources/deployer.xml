@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE beans PUBLIC "-//SPRING//DTD BEAN//EN" "http://www.springframework.org/dtd/spring-beans.dtd">
+<beans default-autowire="byName">
+	
+    <bean id="appDeployer1" class="com.taobao.gaia.AppDeployer">
+       	<property name="codeLocation" value="/home/admin/tair_src/"/>
+       	<property name="programeLocation" value="/home/admin/tair_bin/"/>
+       	<property name="compressFileList">  
+     	 	<map>  
+        		<entry key="/home/admin/tair_bin/sbin/" value="sbin.tgz"/>  
+       			<entry key="/home/admin/tair_bin/lib/" value="lib.tgz"/>  
+     		 </map>  
+  		</property>  
+		<property name="serverList">
+			<list>
+				<value>10.232.4.14</value>
+				<value>10.232.4.15</value>
+				<value>10.232.4.16</value>
+				<value>10.232.4.17</value>
+				<value>10.232.4.18</value>
+			</list>
+		</property>
+		<property name="compileCmds">
+			<value><![CDATA[LD_LIBRARY_PATH=/home/admin/usr/local/lib:/home/admin/tair_bin/lib:${LD_LIBRARY_PATH} && export LD_LIBRARY_PATH && CPLUS_INCLUDE_PATH=/home/admin/usr/local/include:${CPLUS_INCLUDE_PATH} && export CPLUS_INCLUDE_PATH && TBLIB_ROOT=/home/admin/usr/local && export TBLIB_ROOT && make -j8 && make install]]></value>
+		</property>
+		
+    </bean>
+     
+</beans>

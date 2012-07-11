@@ -1,0 +1,29 @@
+meta server的返回值
+
+程序错误
+EXIT_CLUSTER_ID_ERROR       -14006    //写文件的cluster_id错误 内部错误, 不应该出现
+EXIT_UPDATE_FRAG_INFO_ERROR -14008    //
+EXIT_VERSION_CONFLICT_ERROR -14004    //这个在cache版本中应该不出现, 表示有并发的写到达数据库
+EXIT_UNKNOWN_SQL_ERROR      -14000    //后端数据库发生未知错误
+
+内部错误
+EXIT_NOT_PERM_OPER          -1008     //server端发生切换
+TFS_ERROR                             //一般是server端代码错误
+EXIT_LEASE_EXPIRED          -5007     //server端发生切换
+EXIT_TABLE_VERSION_ERROR    -15003    //server端发生切换
+
+
+可以反给客户的错误
+EXIT_INVALID_FILE_NAME      -14010 	//不符合要求的文件名或路径名
+EXIT_PARENT_EXIST_ERROR     -14002	//找不到父目录信息, 可能是要访问的文件不存在
+EXIT_TARGET_EXIST_ERROR     -14001	//创建一个已经存在的文件(目录)或者删除一个不存在的文件(目录)
+EXIT_MOVE_TO_SUB_DIR_ERROR  -14011      //父目录移动到自己的子目录之下
+EXIT_NOT_CREATE_ERROR       -14005 	//写一个没有create过的文件
+EXIT_WRITE_EXIST_POS_ERROR  -14009 	//发生了覆盖写操作.
+EXIT_FRAG_META_OVERFLOW_ERROR	-14007  //分片太多, 超过额定值
+EXIT_DELETE_DIR_WITH_FILE_ERROR -14003  //删除的目录中还有文件或子目录
+EXIT_OVER_MAX_SUB_DIRS_COUNT    -14012  //我们限制每个目录下子目录的个数, 这个错误表示子目录超过限制
+EXIT_OVER_MAX_SUB_DIRS_DEEP     -14013  //超过目录层次深度限制
+EXIT_OVER_MAX_SUB_FILES_COUNT   -14014  //超过子目录最大文件数限制
+
+
