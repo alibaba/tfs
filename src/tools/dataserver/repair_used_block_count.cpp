@@ -6,7 +6,7 @@
  * published by the Free Software Foundation.
  *
  *
- * Version: $Id: gen_block_prefix.cpp 553 2012-03-06 15:30 linqing.zyd@taobao.com $
+ * Version: $Id: repair_block_count.cpp 553 2012-07-16 15:30 linqing.zyd@taobao.com $
  *
  * Authors:
  *   linqing.zyd@taobao.com
@@ -57,7 +57,7 @@ int main(int argc,char* argv[])
         server_index = optarg;
         break;
       case 'v':
-        fprintf(stderr, "generate block prefix tool, version: %s\n", Version::get_build_description());
+        fprintf(stderr, "repair block count tool, version: %s\n", Version::get_build_description());
         return 0;
       case 'h':
       default:
@@ -95,24 +95,6 @@ int main(int argc,char* argv[])
     return ret;
   }
 
-  // check if exsits?  if so, we can't override
-  string block_prefix_file = super_block.mount_point_ + BLOCK_HEADER_PREFIX;
-  ret = access(block_prefix_file.c_str(), F_OK);
-  if (0 == ret)
-  {
-    fprintf(stderr, "%s already exists. \n", block_prefix_file.c_str());
-    return ret;
-  }
-
-  // doesn't exist, create it
-  ret = BlockFileManager::get_instance()->create_block_prefix();
-  if (TFS_SUCCESS != ret)
-  {
-    fprintf(stderr, "create block_prefix file fail. ret: %d\n", ret);
-    return ret;
-  }
-
-  // read bitmap
   BitMap normal_bit_map;
   char* bit_map_data = NULL;
   int32_t bit_map_len = 0;
@@ -121,84 +103,39 @@ int main(int argc,char* argv[])
   normal_bit_map.mount(bit_map_len * 8, bit_map_data, false);
 
   int block_count = super_block.main_block_count_ + super_block.extend_block_count_;
-  int pf_file_size = block_count * sizeof(BlockPrefix);
-
-  // just map whole file
-  MMapOption map_option;
-  map_option.max_mmap_size_ = pf_file_size;
-  map_option.first_mmap_size_ = pf_file_size;
-  map_option.per_mmap_size_ = pf_file_size;
-
-  MMapFileOperation* file_op = new MMapFileOperation(block_prefix_file.c_str());
-  ret = file_op->mmap_file(map_option);
-  if (TFS_SUCCESS != ret)
-  {
-    fprintf(stderr, "mmap block_prefix file fail. ret: %d\n", ret);
-    tbsys::gDelete(file_op);
-    return ret;
-  }
-
-  // read block header
-  BlockPrefix block_prefix;
-  string block_file;
+  int used_main_block_count = 0;
+  int used_ext_block_count = 0;
 
   for (int i = 1; i <= block_count; i++)
   {
     if (normal_bit_map.test(i))
     {
-      stringstream tmp_stream;
       if (i <= super_block.main_block_count_)
       {
-        tmp_stream << super_block.mount_point_ <<  MAINBLOCK_DIR_PREFIX << i;
+        used_main_block_count++;
       }
       else
       {
-        tmp_stream << super_block.mount_point_ <<  EXTENDBLOCK_DIR_PREFIX << i;
+        used_ext_block_count++;
       }
-      tmp_stream >> block_file;
-
-      printf("processing block %s ...\n", block_file.c_str());
-
-      FileOperation *block_op = new FileOperation(block_file);
-      ret = block_op->pread_file((char*)(&block_prefix), sizeof(BlockPrefix), 0);
-      if (TFS_SUCCESS != ret)
-      {
-        fprintf(stderr, "read main block %d header fail. ret: %d\n", i, ret);
-        tbsys::gDelete(block_op);
-        file_op->munmap_file();
-        tbsys::gDelete(file_op);
-        return ret;
-      }
-
-      ret = file_op->pwrite_file((char*)(&block_prefix), sizeof(BlockPrefix), (i - 1) * sizeof(BlockPrefix));
-      if (TFS_SUCCESS != ret)
-      {
-        fprintf(stderr, "write block %d header fail. ret: %d\n", i, ret);
-        tbsys::gDelete(block_op);
-        file_op->munmap_file();
-        tbsys::gDelete(file_op);
-        return ret;
-      }
-
-      tbsys::gDelete(block_op);
     }
   }
 
-  // flush file
-  ret = file_op->flush_file();
-  if (TFS_SUCCESS != ret)
+  // correct used main block count
+  super_block.used_block_count_ = used_main_block_count;
+  super_block.used_extend_block_count_ = used_ext_block_count;
+
+  // flush fs super
+  SuperBlockImpl* super_block_impl = new SuperBlockImpl(SYSPARAM_FILESYSPARAM.mount_name_
+      , SYSPARAM_FILESYSPARAM.super_block_reserve_offset_);
+  ret = super_block_impl->write_super_blk(super_block);
+  if (0 == ret)
   {
-    fprintf(stderr, "sync block_prefix file fail. ret: %d\n", ret);
-    file_op->munmap_file();
-    tbsys::gDelete(file_op);
-    return ret;
+    printf("correct used main block count to: %d\n", used_main_block_count);
+    printf("correct used ext block count to: %d\n", used_ext_block_count);
+    super_block_impl->flush_file();
   }
-
-  printf("generate block prefix file successfully!\n");
-
-  // munmmap file
-  file_op->munmap_file();
-  tbsys::gDelete(file_op);
+  tbsys::gDelete(super_block_impl);
 
   return 0;
 }

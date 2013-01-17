@@ -26,6 +26,12 @@ META_CMD="${META_BIN} -f ${TFS_META_CONF} -d"
 UP_TIME=4
 DOWN_TIME=8
 
+#mysql related variable
+HOST="xx.xx.xx.xx"
+DB_USER="db_user"
+DB_PASS="db_pass"
+DB_NAME="db_name"
+
 ulimit -c unlimited
 
 warn_echo()
@@ -45,8 +51,19 @@ succ_echo()
 
 print_usage()
 {
-    warn_echo "Usage: $0 [start_ns | check_ns | stop_ns | start_ds ds_index | check_ds | stop_ds ds_index | stop_ds_all | admin_ns | admin_ds | check_admin | stop_admin | start_rc | check_rc | stop_rc | start_rs | check_rs | stop_rs | start_meta | check_meta | stop_meta]"
+    warn_echo "Usage: $0 [start_ns | check_ns | stop_ns | start_ds ds_index | check_ds | stop_ds ds_index | start_ds_all | stop_ds_all | admin_ns | admin_ds | check_admin | stop_admin | start_rc | check_rc | stop_rc | start_rs | check_rs | stop_rs | start_meta | check_meta | stop_meta]"
     warn_echo "ds_index format : 2-4 OR 2,4,3 OR 2-4,6,7 OR '2-4 5,7,8'"
+}
+
+#$1: sql
+mysql_op()
+{
+  sql_express=$1
+  mysql -h$HOST -u$DB_USER -p$DB_PASS << EOF
+  use $DB_NAME;
+  $sql_express;
+  QUIT
+EOF
 }
 
 # get command or name infomation dynamically
@@ -157,6 +174,20 @@ get_index()
     else
         echo "$ds_index"
     fi
+}
+
+# get all index from db
+# $1 : ds_host
+get_index_from_db()
+{
+  host=$1
+  local ds_index_list=""
+  ret=`mysql_op "select ds_index_list from tfs_machine where ip=\"$host\""`
+  if [ -n "$ret" ]
+  then
+    ds_index_list=`echo $ret | awk '{print $NF}'`
+  fi
+  echo $ds_index_list
 }
 
 # check if only one instance is running
@@ -358,6 +389,18 @@ stop_admin()
     do_stop "admin" $1
 }
 
+start_ds_all()
+{
+  host=`hostname -i`
+  ds_index_list=`get_index_from_db $host`
+  if ! [ -n "$ds_index_list" ]
+  then
+      fail_echo "No ds index info found"
+  else
+      do_start "ds" "`get_index $ds_index_list`"
+  fi
+}
+
 stop_ds_all()
 {
     run_index=`ps -ef | egrep "${DS_CMD}" | egrep -o " -i +[0-9]+" | awk '{print $2}' | sort -n`
@@ -535,6 +578,9 @@ case "$1" in
         ;;
     stop_ds)
         stop_ds "$2"
+        ;;
+    start_ds_all)
+        start_ds_all
         ;;
     stop_ds_all)
         stop_ds_all

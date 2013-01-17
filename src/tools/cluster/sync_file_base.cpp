@@ -6,7 +6,7 @@
  * published by the Free Software Foundation.
  *
  *
- * Version: $Id$
+ * Version: $Id: sync_file_base.cpp 1542 2012-06-27 02:02:37Z duanfei@taobao.com $
  *
  * Authors:
  *   chuyu <chuyu@taobao.com>

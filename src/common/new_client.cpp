@@ -172,7 +172,7 @@ namespace tfs
           ret = post_request((*iter), packet, send_id);
           if (common::TFS_SUCCESS != ret)
           {
-            TBSYS_LOG(ERROR, "async post request fail, iret: %d", ret);
+            TBSYS_LOG(ERROR, "async post request fail, ret: %d", ret);
             break;
           }
         }

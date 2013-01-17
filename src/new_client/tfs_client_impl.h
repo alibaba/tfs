@@ -82,11 +82,13 @@ namespace tfs
      // for test
       void insert_local_block_cache(const char* ns_addr, const uint32_t block_id, const common::VUINT64& ds_list);
       void remove_local_block_cache(const char* ns_addr, const uint32_t block_id);
+      bool is_hit_local_cache(const char* ns_addr, const char* tfs_name) const;
 #ifdef WITH_TAIR_CACHE
       void set_remote_cache_info(const char* remote_cache_master_addr, const char* remote_cache_slave_addr,
              const char* remote_cache_group_name, const int32_t area);
       void insert_remote_block_cache(const char* ns_addr, const uint32_t block_id, const common::VUINT64& ds_list);
       void remove_remote_block_cache(const char* ns_addr, const uint32_t block_id);
+      bool is_hit_remote_cache(const char* ns_addr, const char* tfs_name) const;
 #endif
 
       void set_segment_size(const int64_t segment_size);
@@ -204,6 +206,10 @@ namespace tfs
       TfsFile* get_file(const int fd);
       int insert_file(const int fd, TfsFile* tfs_file);
       int erase_file(const int fd);
+      bool is_hit_local_cache(const char* ns_addr, const uint32_t block_id) const;
+#ifdef WITH_TAIR_CACHE
+      bool is_hit_remote_cache(const char* ns_addr, const uint32_t block_id) const;
+#endif
 
     private:
       TfsClientImpl();

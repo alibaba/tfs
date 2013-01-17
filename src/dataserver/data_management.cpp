@@ -276,7 +276,7 @@ namespace tfs
     {
       data_file_mutex_.lock();
       DataFileMapIter bit = data_file_map_.find(file_number);
-      if (bit != data_file_map_.end() && NULL != bit->second)
+      if (bit != data_file_map_.end() && NULL != bit->second && bit->second->get_ref() <= 0)
       {
         tbsys::gDelete(bit->second);
         data_file_map_.erase(bit);

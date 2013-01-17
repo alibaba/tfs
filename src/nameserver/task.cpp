@@ -530,8 +530,8 @@ namespace tfs
                 if ((NULL != source) && block->exist(source, false))
                   result = manager_.get_manager().relieve_relation(block, source, now,BLOCK_COMPARE_SERVER_BY_ID);
                 manager_.get_manager().build_relation(block, dest, now);
-                ret = block->get_servers_size() > 0 && result ?  STATUS_MESSAGE_REMOVE : STATUS_MESSAGE_OK;
-                if ((block->get_servers_size() <= 0) && (NULL != source))
+                ret = manager_.get_manager().get_block_manager().get_servers_size(block) > 0 && result ?  STATUS_MESSAGE_REMOVE : STATUS_MESSAGE_OK;
+                if ((manager_.get_manager().get_block_manager().get_servers_size(block) <= 0) && (NULL != source))
                 {
                   manager_.get_manager().build_relation(block, source, now, true);
                 }

@@ -428,7 +428,7 @@ namespace tfs
         ret = NULL != block ? TFS_SUCCESS : EXIT_BLOCK_NOT_FOUND;
         if (TFS_SUCCESS == ret)
         {
-          if (block->get_servers_size() <= 0)
+          if (get_block_manager().get_servers_size(block) <= 0)
           {
             if (block->is_creating())
             {
@@ -765,8 +765,8 @@ namespace tfs
     {
       int64_t need = 0;
       time_t now = 0;
-      const int32_t MAX_REDUNDNAT_NUMS = 256;
-      const int32_t MAX_SLEEP_TIME_US  = 5000;
+      const int32_t MAX_REDUNDNAT_NUMS = 128;
+      const int32_t MAX_SLEEP_TIME_US  = 500000;
       NsRuntimeGlobalInformation& ngi = GFactory::get_runtime_info();
       int32_t hour = common::SYSPARAM_NAMESERVER.report_block_time_upper_ - common::SYSPARAM_NAMESERVER.report_block_time_lower_ ;
       const int32_t SAFE_MODE_TIME = hour > 0 ? hour * 3600 : SYSPARAM_NAMESERVER.safe_mode_time_ * 4;
@@ -1089,6 +1089,12 @@ namespace tfs
           new_create_block_collect = NULL != block;
         }
         ret = (NULL != block) ? TFS_SUCCESS : EXIT_NO_BLOCK;
+
+        if (TFS_SUCCESS == ret)
+        {
+          ret = get_block_manager().get_servers_size(block) <= 0 ? TFS_SUCCESS : EXIT_BLOCK_ALREADY_EXIST;
+        }
+
         if (TFS_SUCCESS == ret)//find or create block successful
         {
           get_block_manager().get_servers(helper, block);
@@ -1122,11 +1128,9 @@ namespace tfs
                 else
                 {
                   block = get_block_manager().get(block_id);
-                  if ((new_create_block_collect)
-                      || ((NULL != block)
-                        && (!new_create_block_collect)
-                        && (!block->is_creating())
-                        && (block->get_servers_size() <= 0)))
+                  if ((NULL != block)
+                      && (get_block_manager().get_servers_size(block) <= 0)
+                      && (new_create_block_collect || !block->is_creating()))
                   {
                     get_block_manager().remove(pobject,block_id);
                   }
@@ -1144,6 +1148,7 @@ namespace tfs
     BlockCollect* LayoutManager::add_new_block_helper_create_by_system_(uint32_t& block_id, ServerCollect* server, const time_t now)
     {
       BlockCollect* block = NULL;
+      bool new_create_block_collect = false;
       int32_t ret =  (0 == block_id) ? TFS_SUCCESS : EXIT_PARAMETER_ERROR;
       if (TFS_SUCCESS == ret)
       {
@@ -1158,9 +1163,18 @@ namespace tfs
         ret = (INVALID_BLOCK_ID == block_id) ? EXIT_BLOCK_ID_INVALID_ERROR : TFS_SUCCESS;
         if (TFS_SUCCESS == ret)
         {
-          //add block collect object
-          block = get_block_manager().insert(block_id, now, true);
+          block = get_block_manager().get(block_id);
           ret = (NULL != block) ? TFS_SUCCESS : EXIT_NO_BLOCK;
+          //add block collect object
+          new_create_block_collect = TFS_SUCCESS != ret;
+          if (new_create_block_collect)
+            block = get_block_manager().insert(block_id, now, true);
+          ret = (NULL != block) ? TFS_SUCCESS : EXIT_NO_BLOCK;
+        }
+
+        if (TFS_SUCCESS == ret)
+        {
+          ret = get_block_manager().get_servers_size(block) <= 0 ? TFS_SUCCESS : EXIT_BLOCK_ALREADY_EXIST;
         }
 
         if (TFS_SUCCESS == ret)
@@ -1172,10 +1186,12 @@ namespace tfs
           }
           GCObject* pobject = NULL;
           ret = !helper.empty() ? TFS_SUCCESS : EXIT_CHOOSE_CREATE_BLOCK_TARGET_SERVER_ERROR;
-          if (TFS_SUCCESS == ret)//add block collect object successful
+          bool successful = TFS_SUCCESS == ret;
+          if (successful)//add block collect object successful
           {
             ret = add_new_block_helper_send_msg_(block_id, helper);
-            if (TFS_SUCCESS == ret)
+            successful = TFS_SUCCESS == ret;
+            if (successful)
             {
               //build relation
               ret = add_new_block_helper_build_relation_(block, helper, now);
@@ -1184,14 +1200,13 @@ namespace tfs
                 add_new_block_helper_write_log_(block_id, helper, now);
               }
             }//end send message to dataserver successful
-            else
-            {
-              get_block_manager().remove(pobject, block_id);//rollback
-            }
           }
-          else
+          if ((!successful)
+              && (NULL != block)
+              && (get_block_manager().get_servers_size(block) <= 0)
+              && (new_create_block_collect || !block->is_creating()))
           {
-            get_block_manager().remove(pobject, block_id);//rollback
+            get_block_manager().remove(pobject,block_id);//rollback
           }
           if (NULL != pobject)
             get_gc_manager().add(pobject, now);

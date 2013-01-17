@@ -527,6 +527,7 @@ namespace tfs
       uint64_t new_file_id = 0;
       int64_t file_num = 0;
       uint32_t crc = 0;
+      int32_t version = -1;
 
       int ret = create_file_num(server_id, block_id, file_id, new_file_id, file_num);
       if (ret == TFS_ERROR)
@@ -544,9 +545,32 @@ namespace tfs
       int32_t read_len;
       int32_t offset = 0;
       ret = TFS_SUCCESS;
-      while ((read_len = read(fd, data, MAX_READ_SIZE)) > 0)
+
+
+      // get ds version
+
+      GetBlockInfoMessage req_gbi_msg;
+      req_gbi_msg.set_block_id(block_id);
+
+      NewClient* client = NewClientManager::get_instance().create_client();
+      tbnet::Packet* ret_msg = NULL;
+      if (TFS_SUCCESS == send_msg_to_server(server_id, client, &req_gbi_msg, ret_msg))
       {
-        if (write_data(server_id, block_id, data, read_len, offset, file_id, file_num) != read_len)
+        UpdateBlockInfoMessage *req_ubi_msg = dynamic_cast<UpdateBlockInfoMessage*> (ret_msg);
+        const BlockInfo* block_info = req_ubi_msg->get_block();
+        version = block_info->version_;
+      }
+      else
+      {
+        ret = TFS_ERROR;
+      }
+      NewClientManager::get_instance().destroy_client(client);
+
+
+
+      while ((read_len = read(fd, data, MAX_READ_SIZE)) > 0 && TFS_SUCCESS == ret)
+      {
+        if (write_data(server_id, block_id, data, read_len, offset, file_id, file_num, version) != read_len)
         {
           ret = TFS_ERROR;
           break;
@@ -873,15 +897,18 @@ namespace tfs
     }
 
     int DsLib::write_data(const uint64_t server_ip, const uint32_t block_id, const char* data, const int32_t length,
-                          const int32_t offset, const uint64_t file_id, const uint64_t file_num)
+                          const int32_t offset, const uint64_t file_id, const uint64_t file_num, const int32_t version)
     {
 
+      printf("version: %d\n", version);
       VUINT64 ds_list;
       ds_list.clear();
       ds_list.push_back(server_ip);
 
       int ret = TFS_ERROR;
       WriteDataMessage req_wd_msg;
+      req_wd_msg.set_lease_id(1);
+      req_wd_msg.set_block_version(version);
       req_wd_msg.set_file_number(file_num);
       req_wd_msg.set_block_id(block_id);
       req_wd_msg.set_file_id(file_id);

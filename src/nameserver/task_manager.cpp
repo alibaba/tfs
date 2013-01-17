@@ -205,7 +205,6 @@ namespace tfs
       tasks_.clear();
       machine_to_tasks_.clear();
       block_to_tasks_.clear();
-      running_queue_.clear();
       pending_queue_.clear();
       server_to_tasks_.clear();
    }
@@ -213,17 +212,11 @@ namespace tfs
     void TaskManager::dump(tbnet::DataBuffer& stream) const
     {
       RWLock::Lock lock(rwmutex_, READ_LOCKER);
-      stream.writeInt32(pending_queue_.size() + running_queue_.size());
+      stream.writeInt32(pending_queue_.size());
       PENDING_TASK_CONST_ITER iter = pending_queue_.begin();
       for (; iter != pending_queue_.end(); ++iter)
       {
         (*iter)->dump(stream);
-      }
-
-      RUNNING_TASK_CONST_ITER it = running_queue_.begin();
-      for (; it != running_queue_.end(); ++it)
-      {
-        (*it)->dump(stream);
       }
     }
 
@@ -234,12 +227,6 @@ namespace tfs
       for (; iter != pending_queue_.end(); ++iter)
       {
         (*iter)->dump(level);
-      }
-
-      RUNNING_TASK_CONST_ITER it = running_queue_.begin();
-      for (; it != running_queue_.end(); ++it)
-      {
-        (*it)->dump(level);
       }
     }
 
@@ -498,14 +485,6 @@ namespace tfs
         TASKS_ITER titer = tasks_.find(task->seqno_);
         if (tasks_.end() != titer)
           tasks_.erase(titer);
-
-        RUNNING_TASK_ITER iter = running_queue_.find(task);
-        if (running_queue_.end() != iter)
-          running_queue_.erase(iter);
-
-        /*PENDING_TASK_ITER piter = pending_queue_.find(task);
-        if (pending_queue_.end() != piter)
-          pending_queue_.erase(piter);*/
 
         BLOCK_TO_TASK_ITER it = block_to_tasks_.find(task->block_id_);
         if (block_to_tasks_.end() != it)

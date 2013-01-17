@@ -25,6 +25,7 @@
 #include "tfs_small_file.h"
 #include "gc_worker.h"
 #include "bg_task.h"
+#include "fsname.h"
 
 using namespace tfs::common;
 using namespace tfs::message;
@@ -659,6 +660,22 @@ void TfsClientImpl::remove_local_block_cache(const char* ns_addr, const uint32_t
   }
 }
 
+bool TfsClientImpl::is_hit_local_cache(const char* ns_addr, const char* tfs_name) const
+{
+  bool ret = false;
+  if (NULL == tfs_name || tfs_name[0] == '\0')
+  {
+    TBSYS_LOG(ERROR, "tfs_name is NULL or empty");
+  }
+  else
+  {
+    FSName fs_name(tfs_name);
+    uint32_t block_id = fs_name.get_block_id();
+    ret = is_hit_local_cache(ns_addr, block_id);
+  }
+  return ret;
+}
+
 #ifdef WITH_TAIR_CACHE
 void TfsClientImpl::set_remote_cache_info(const char* remote_cache_master_addr, const char* remote_cache_slave_addr,
        const char* remote_cache_group_name, const int32_t remote_cache_area)
@@ -708,6 +725,48 @@ void TfsClientImpl::remove_remote_block_cache(const char* ns_addr, const uint32_
   {
     tfs_session->remove_remote_block_cache(block_id);
   }
+}
+
+bool TfsClientImpl::is_hit_remote_cache(const char* ns_addr, const char* tfs_name) const
+{
+  bool ret = false;
+  if (NULL == tfs_name || tfs_name[0] == '\0')
+  {
+    TBSYS_LOG(ERROR, "tfs_name is NULL or empty");
+  }
+  else
+  {
+    FSName fs_name(tfs_name);
+    uint32_t block_id = fs_name.get_block_id();
+    ret = is_hit_remote_cache(ns_addr, block_id);
+  }
+  return ret;
+}
+
+bool TfsClientImpl::is_hit_remote_cache(const char* ns_addr, const uint32_t block_id) const
+{
+  TfsSession *tfs_session = NULL;
+  bool ret = false;
+
+  if (ns_addr != NULL && strlen(ns_addr) > 0)
+  {
+    tfs_session = SESSION_POOL.get(ns_addr);
+  }
+  else
+  {
+    if (NULL != default_tfs_session_)
+    {
+      tfs_session = default_tfs_session_;
+    }
+  }
+
+  if (NULL != tfs_session)
+  {
+    ret = tfs_session->is_hit_remote_cache(block_id);
+  }
+
+  return ret;
+
 }
 #endif
 
@@ -1608,4 +1667,29 @@ int TfsClientImpl::erase_file(const int fd)
   tbsys::gDelete(it->second);
   tfs_file_map_.erase(it);
   return TFS_SUCCESS;
+}
+
+bool TfsClientImpl::is_hit_local_cache(const char* ns_addr, const uint32_t block_id) const
+{
+  TfsSession *tfs_session = NULL;
+  bool ret = false;
+
+  if (ns_addr != NULL && strlen(ns_addr) > 0)
+  {
+    tfs_session = SESSION_POOL.get(ns_addr);
+  }
+  else
+  {
+    if (NULL != default_tfs_session_)
+    {
+      tfs_session = default_tfs_session_;
+    }
+  }
+
+  if (NULL != tfs_session)
+  {
+    ret = tfs_session->is_hit_local_cache(block_id);
+  }
+
+  return ret;
 }

@@ -30,8 +30,9 @@ int main(int argc, char* argv[])
   int help_info = 0;
   int i;
   std::string server_index;
+  bool speedup = false;
 
-  while ((i = getopt(argc, argv, "f:i:vh")) != EOF)
+  while ((i = getopt(argc, argv, "f:i:vhn")) != EOF)
   {
     switch (i)
     {
@@ -40,6 +41,9 @@ int main(int argc, char* argv[])
       break;
     case 'i':
       server_index = optarg;
+      break;
+    case 'n':
+      speedup = true;
       break;
     case 'v':
       fprintf(stderr, "create tfs file system tool, version: %s\n", Version::get_build_description());
@@ -56,6 +60,7 @@ int main(int argc, char* argv[])
     fprintf(stderr, "\nUsage: %s -f conf_file -i index -h -v\n", argv[0]);
     fprintf(stderr, "  -f configure file\n");
     fprintf(stderr, "  -i server_index  dataserver index number\n");
+    fprintf(stderr, "  -n speedup ds start up\n");
     fprintf(stderr, "  -v show version info\n");
     fprintf(stderr, "  -h help info\n");
     fprintf(stderr, "\n");
@@ -69,7 +74,7 @@ int main(int argc, char* argv[])
     cerr << "SysParam::load filesystemparam failed:" << conf_file << endl;
     return ret;
   }
-  
+
   cout << "mount name: " << SYSPARAM_FILESYSPARAM.mount_name_ << " max mount size: "
       << SYSPARAM_FILESYSPARAM.max_mount_size_ << " base fs type: "
       << SYSPARAM_FILESYSPARAM.base_fs_type_ << " superblock reserve offset: "
@@ -81,7 +86,7 @@ int main(int argc, char* argv[])
       << SYSPARAM_FILESYSPARAM.avg_segment_size_ << " hash slot ratio: "
       << SYSPARAM_FILESYSPARAM.hash_slot_ratio_ << endl;
 
-  ret = BlockFileManager::get_instance()->format_block_file_system(SYSPARAM_FILESYSPARAM);
+  ret = BlockFileManager::get_instance()->format_block_file_system(SYSPARAM_FILESYSPARAM, speedup);
   if (ret)
   {
     fprintf(stderr, "create tfs file system fail. ret: %d\n", ret);

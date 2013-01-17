@@ -6,7 +6,7 @@
  * published by the Free Software Foundation.
  *
  *
- * Version: $Id$
+ * Version: $Id: sync_by_log.cpp 1126 2011-12-07 03:35:00Z chuyu $
  *
  * Authors:
  *   chuyu <chuyu@taobao.com>

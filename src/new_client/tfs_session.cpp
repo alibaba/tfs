@@ -196,6 +196,16 @@ int TfsSession::query_remote_block_cache(const uint32_t block_id, VUINT64& rds)
   return ret;
 }
 
+bool TfsSession::is_hit_remote_cache(const uint32_t block_id)
+{
+  int ret = TFS_ERROR;
+  VUINT64 rds;
+  ret = query_remote_block_cache(block_id, rds);
+
+  return ret == TFS_SUCCESS ? true : false;
+
+}
+
 int TfsSession::query_remote_block_cache(const SEG_DATA_LIST& seg_list, int& remote_hit_count)
 {
   int ret = TFS_SUCCESS;
@@ -921,4 +931,22 @@ void TfsSession::remove_local_block_cache(const uint32_t block_id)
     tbutil::Mutex::Lock lock(mutex_);
     block_cache_map_.remove(block_id);
   }
+}
+
+bool TfsSession::is_hit_local_cache(const uint32_t block_id)
+{
+  bool ret = false;
+  if (USE_CACHE_FLAG_LOCAL & ClientConfig::use_cache_)
+  {
+    tbutil::Mutex::Lock lock(mutex_);
+    BlockCache* block_cache = block_cache_map_.find(block_id);
+    if (block_cache
+       && (block_cache->last_time_ >= time(NULL) - block_cache_time_)
+       && (block_cache->ds_.size() > 0))
+    {
+      TBSYS_LOG(DEBUG, "local cache hit, blockid: %u", block_id);
+      ret = true;
+    }
+  }
+  return ret;
 }

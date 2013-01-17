@@ -157,7 +157,7 @@ namespace tfs
         }
         else
         {
-          fprintf(fp, "\n%25s", " ");
+          fprintf(fp, "\n%25s%6u", " ", (*iter));
           count = 0;
         }
         count++;

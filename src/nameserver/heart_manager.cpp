@@ -341,7 +341,7 @@ namespace tfs
         }
         else
         {
-          keepalive_(sleep_time, keepalive_type_, ngi, now);
+          keepalive_(sleep_time, keepalive_type_, ngi);
           if (!ngi.has_valid_lease(now))
             keepalive_type_ = NS_KEEPALIVE_TYPE_LOGIN;
           else
@@ -356,7 +356,7 @@ namespace tfs
         Func::sleep(sleep_time, ngi.destroy_flag_);
       }
       keepalive_type_ = NS_KEEPALIVE_TYPE_LOGOUT;
-      keepalive_(sleep_time, keepalive_type_, ngi, now);
+      keepalive_(sleep_time, keepalive_type_, ngi);
     }
 
     bool NameServerHeartManager::check_vip_(const NsRuntimeGlobalInformation& ngi) const
@@ -451,7 +451,7 @@ namespace tfs
       return ret;
 
     }
-    int NameServerHeartManager::keepalive_(int32_t& sleep_time, NsKeepAliveType& type, NsRuntimeGlobalInformation& ngi, const time_t now)
+    int NameServerHeartManager::keepalive_(int32_t& sleep_time, NsKeepAliveType& type, NsRuntimeGlobalInformation& ngi)
     {
       MasterAndSlaveHeartMessage msg;
       msg.set_ip_port(ngi.owner_ip_port_);
@@ -463,8 +463,8 @@ namespace tfs
       interval = std::max(interval, 1);
 
       int32_t ret = TFS_ERROR;
-      int32_t MAX_RETRY_COUNT = interval * 1000;
-      int32_t MAX_TIMEOUT_TIME_MS = 1000;
+      int32_t MAX_RETRY_COUNT = 2;
+      int32_t MAX_TIMEOUT_TIME_MS = 500;
       NewClient* client = NULL;
       tbnet::Packet* response = NULL;
       for (int32_t i = 0; i < MAX_RETRY_COUNT && TFS_SUCCESS != ret; ++i)
@@ -483,7 +483,7 @@ namespace tfs
             }
             else
             {
-              ngi.renew(result->get_lease_id(), result->get_lease_expired_time(), now);
+              ngi.renew(result->get_lease_id(), result->get_lease_expired_time(), Func::get_monotonic_time());
               sleep_time = result->get_renew_lease_interval_time();
               ngi.update_peer_info(result->get_ip_port(), result->get_role(), result->get_status());
             }

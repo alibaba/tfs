@@ -53,7 +53,7 @@ namespace dataserver
 
   void GCObjectManager::run()
   {
-    int64_t now = time(NULL); 
+    int64_t now = time(NULL);
     GCObject* obj = NULL;
     tbutil::Mutex::Lock lock(mutex_);
     std::list<GCObject*>::iterator iter = object_list_.begin();
@@ -76,11 +76,11 @@ namespace dataserver
   int GCObjectManager::initialize(tbutil::TimerPtr timer)
   {
     ExpireTimerTaskPtr task = new ExpireTimerTask(*this);
-    int iret = timer->scheduleRepeated(task, tbutil::Time::seconds(SYSPARAM_DATASERVER.object_dead_max_time_));
+    int iret = timer->scheduleRepeated(task, GC_WORKER_INTERVAL);
     is_init_ = true;
     return iret < 0 ? TFS_ERROR : TFS_SUCCESS;
   }
-  
+
   int GCObjectManager::wait_for_shut_down()
   {
     tbutil::Mutex::Lock lock(mutex_);

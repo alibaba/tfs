@@ -45,7 +45,7 @@ namespace tfs
         }
 
       public:
-        int format_block_file_system(const common::FileSystemParameter& fs_param);
+        int format_block_file_system(const common::FileSystemParameter& fs_param, const bool speedup = false);
         int clear_block_file_system(const common::FileSystemParameter& fs_param);
         int bootstrap(const common::FileSystemParameter& fs_param);
 

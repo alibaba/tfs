@@ -71,19 +71,22 @@ namespace tfs
           rc_client_.base_info_ = new_base_info;
           rc_client_.calculate_ns_info(new_base_info);
 #ifdef WITH_TAIR_CACHE
-          std::vector<std::string> ns_cache_info;
-          common::Func::split_string(rc_client_.base_info_.ns_cache_info_.c_str(), ';', ns_cache_info);
-          if (ns_cache_info.size() == 4)
+          if (!rc_client_.ignore_rc_remote_cache_info_)
           {
-            TfsClientImpl::Instance()->set_remote_cache_info(ns_cache_info[0].c_str(),
-                ns_cache_info[1].c_str(), ns_cache_info[2].c_str(),
-                atoi(ns_cache_info[3].c_str()));
-            TfsClientImpl::Instance()->set_use_remote_cache(rc_client_.base_info_.use_remote_cache_);
-          }
-          else
-          {
-            TBSYS_LOG(WARN, "invalid ns_cache_info(size: %zd), remote cache will not initialize", ns_cache_info.size());
-            TfsClientImpl::Instance()->set_use_remote_cache(false);
+            std::vector<std::string> ns_cache_info;
+            common::Func::split_string(rc_client_.base_info_.ns_cache_info_.c_str(), ';', ns_cache_info);
+            if (ns_cache_info.size() == 4)
+            {
+              TfsClientImpl::Instance()->set_remote_cache_info(ns_cache_info[0].c_str(),
+                  ns_cache_info[1].c_str(), ns_cache_info[2].c_str(),
+                  atoi(ns_cache_info[3].c_str()));
+              TfsClientImpl::Instance()->set_use_remote_cache(rc_client_.base_info_.use_remote_cache_);
+            }
+            else
+            {
+              TBSYS_LOG(WARN, "invalid ns_cache_info(size: %zd), remote cache will not initialize", ns_cache_info.size());
+              TfsClientImpl::Instance()->set_use_remote_cache(false);
+            }
           }
 #endif
           rc_client_.session_base_info_.modify_time_ = rc_client_.base_info_.modify_time_;
@@ -120,7 +123,7 @@ namespace tfs
     RcClientImpl::RcClientImpl()
       :need_use_unique_(false), local_addr_(0),
       init_stat_(INIT_INVALID), active_rc_ip_(0), next_rc_index_(0),
-      name_meta_client_(NULL), app_id_(0), my_fd_(1)
+      ignore_rc_remote_cache_info_(false), name_meta_client_(NULL), app_id_(0), my_fd_(1)
     {
     }
 
@@ -277,11 +280,25 @@ namespace tfs
       return ret;
     }
 
+#ifdef WITH_TAIR_CACHE
+    void RcClientImpl::set_remote_cache_info(const char * remote_cache_info)
+    {
+      std::vector<std::string> tair_addr;
+      common::Func::split_string(remote_cache_info, ';', tair_addr);
+      if (tair_addr.size() == 4)
+      {
+        TfsClientImpl::Instance()->set_remote_cache_info(tair_addr[0].c_str(),
+            tair_addr[1].c_str(), tair_addr[2].c_str(),
+            atoi(tair_addr[3].c_str()));
+        ignore_rc_remote_cache_info_ = true;
+        TfsClientImpl::Instance()->set_use_remote_cache(true);
+      }
+    }
+#endif
 
     void RcClientImpl::set_wait_timeout(const int64_t timeout_ms)
     {
       TfsClientImpl::Instance()->set_wait_timeout(timeout_ms);
-      return;
     }
 
     void RcClientImpl::set_log_level(const char* level)
@@ -306,9 +323,10 @@ namespace tfs
         }
         else if (RcClient::READ == mode)
         {
-          if (*file_name == 'L' && false == large)
+          if ((*file_name == 'L' && false == large)
+              || (*file_name == 'T' && true == large))
           {
-            TBSYS_LOG(WARN, "open a tfs large file without large flag");
+            TBSYS_LOG(WARN, "open a tfs file without right flag");
           }
         }
       }
@@ -794,7 +812,7 @@ namespace tfs
         string ns_addr;
         do
         {
-          ns_addr = get_ns_addr(NULL, RcClient::CREATE, ns_get_index++);
+          ns_addr = get_ns_addr(tfs_name_buff, RcClient::CREATE, ns_get_index++);
           if (ns_addr.empty())
           {
             break;
@@ -816,7 +834,7 @@ namespace tfs
         string ns_addr;
         do
         {
-          ns_addr = get_ns_addr(NULL, RcClient::CREATE, ns_get_index++);
+          ns_addr = get_ns_addr(tfs_name_buff, RcClient::CREATE, ns_get_index++);
           if (ns_addr.empty())
           {
             break;
@@ -869,6 +887,55 @@ namespace tfs
       }
       return ret;
     }
+
+
+    bool RcClientImpl::is_hit_local_cache(const char* tfs_name)
+    {
+      int ret = check_init_stat();
+      bool bret = false;
+      if (TFS_SUCCESS == ret)
+      {
+        int ns_get_index = 0;
+        string ns_addr;
+        do
+        {
+          ns_addr = get_ns_addr(tfs_name, RcClient::READ, ns_get_index++);
+          if (ns_addr.empty())
+          {
+            break;
+          }
+          bret = TfsClientImpl::Instance()->is_hit_local_cache(ns_addr.c_str(), tfs_name);
+        } while(!bret);
+      }
+
+      return bret;
+    }
+
+#ifdef WITH_TAIR_CACHE
+
+    bool RcClientImpl::is_hit_remote_cache(const char* tfs_name)
+    {
+      int ret = check_init_stat();
+      bool bret = false;
+      if (TFS_SUCCESS == ret)
+      {
+        int ns_get_index = 0;
+        string ns_addr;
+        do
+        {
+          ns_addr = get_ns_addr(tfs_name, RcClient::READ, ns_get_index++);
+          if (ns_addr.empty())
+          {
+            break;
+          }
+          bret = TfsClientImpl::Instance()->is_hit_remote_cache(ns_addr.c_str(), tfs_name);
+        } while(!bret);
+      }
+
+      return bret;
+    }
+
+#endif
 
     int64_t RcClientImpl::save_file(const char* ns_addr, const char* local_file, char* tfs_name_buff,
         const int32_t buff_len, const char* suffix, const bool is_large_file)

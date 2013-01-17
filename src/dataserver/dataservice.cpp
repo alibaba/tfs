@@ -64,6 +64,7 @@ namespace tfs
       //init dataserver info
       memset(need_send_blockinfo_, 0, sizeof(need_send_blockinfo_));
       memset(&data_server_info_, 0, sizeof(DataServerStatInfo));
+      data_server_info_.status_ = DATASERVER_STATUS_DEAD;
       memset(set_flag_, 0, sizeof(set_flag_));
       memset(hb_ip_port_, 0, sizeof(hb_ip_port_));
     }
@@ -1695,7 +1696,7 @@ namespace tfs
       resp_fi_msg->set_file_info(&finfo);
       message->reply(resp_fi_msg);
       TIMER_END();
-      TBSYS_LOG(INFO, "read fileinfo %s. blockid: %u, fileid: %" PRI64_PREFIX "u, mode: %d, cost time: %" PRI64_PREFIX "d",
+      TBSYS_LOG(DEBUG, "read fileinfo %s. blockid: %u, fileid: %" PRI64_PREFIX "u, mode: %d, cost time: %" PRI64_PREFIX "d",
           TFS_SUCCESS == ret ? "success" : "fail", block_id, file_id, mode, TIMER_DURATION());
       return TFS_SUCCESS;
     }

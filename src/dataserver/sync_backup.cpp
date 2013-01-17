@@ -155,8 +155,8 @@ namespace tfs
           sleep(wait_time);
         }
         ret = sync_stat(sf->block_id_, sf->file_id_);
-        TBSYS_LOG(INFO, "sync_stat block_id: %u, file_id: %"PRI64_PREFIX"u, action: %d, retry_count: %d, ret: %d",
-          sf->block_id_, sf->file_id_, sf->cmd_, i + 1, ret);
+        TBSYS_LOG(INFO, "sync_stat block_id: %u, file_id: %"PRI64_PREFIX"u, action: %d, ret: %d, retry_count: %d",
+          sf->block_id_, sf->file_id_, sf->cmd_, ret, i + 1);
       }
 
       return ret;
@@ -345,7 +345,7 @@ namespace tfs
         }
         else
         {
-          if (length < FILEINFO_SIZE)
+          if (length <= FILEINFO_SIZE)
           {
             ret = EXIT_READ_FILE_SIZE_ERROR;
             TBSYS_LOG(ERROR,

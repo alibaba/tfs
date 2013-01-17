@@ -383,7 +383,7 @@ namespace tfs
         }
         else
         {
-          ret = block->get_servers_size() <= 0 ? TFS_SUCCESS : EXIT_BLOCK_REPLICATE_EXIST;
+          ret = manager_.get_block_manager().get_servers_size(block) <= 0 ? TFS_SUCCESS : EXIT_BLOCK_REPLICATE_EXIST;
         }
         ret  = NULL == block ? EXIT_NO_BLOCK : TFS_SUCCESS;
         if (TFS_SUCCESS != ret)
@@ -410,11 +410,11 @@ namespace tfs
             }
             if (TFS_SUCCESS == ret)
             {
-              ret = manager_.build_relation(block, server, now, true);
+              ret = manager_.build_relation(block, server, now, true) ? TFS_SUCCESS : EXIT_BUILD_RELATION_ERROR;
             }
           }
           GCObject* pobject = NULL;
-          if (block->get_servers_size() <= 0 && new_create_block_collect)
+          if (manager_.get_block_manager().get_servers_size(block) <= 0 && new_create_block_collect)
             manager_.get_block_manager().remove(pobject, info.value3_);
           if (NULL != pobject)
             manager_.get_gc_manager().add(pobject, now);
@@ -474,7 +474,7 @@ namespace tfs
             ret = NULL != server ? TFS_SUCCESS : EIXT_SERVER_OBJECT_NOT_FOUND;
             if (TFS_SUCCESS == ret)
               manager_.relieve_relation(block, server, now, BLOCK_COMPARE_SERVER_BY_ID);
-            if (block->get_servers_size() <= 0)
+            if (manager_.get_block_manager().get_servers_size(block) <= 0)
               manager_.get_block_manager().remove(pobject, info.value3_);
           }
           else
@@ -580,7 +580,7 @@ namespace tfs
             }
           }
           GCObject* pobject = NULL;
-          if (block->get_servers_size() <= 0 && new_create_block_collect)
+          if (manager_.get_block_manager().get_servers_size(block) <= 0 && new_create_block_collect)
             manager_.get_block_manager().remove(pobject, info.value3_);
           if (NULL != pobject)
             manager_.get_gc_manager().add(pobject, now);

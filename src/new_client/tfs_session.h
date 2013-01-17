@@ -58,6 +58,7 @@ namespace tfs
 
       void insert_local_block_cache(const uint32_t block_id, const common::VUINT64& rds);
       void remove_local_block_cache(const uint32_t block_id);
+      bool is_hit_local_cache(const uint32_t block_id);
 
       inline int32_t get_cluster_id() const
       {
@@ -134,6 +135,7 @@ namespace tfs
       static TairCacheHelper* remote_cache_helper_;
     public:
       int init_remote_cache_helper();
+      bool is_hit_remote_cache(uint32_t block_id);
       bool check_init();
       void insert_remote_block_cache(const uint32_t block_id, const common::VUINT64& rds);
       int query_remote_block_cache(const uint32_t block_id, common::VUINT64& rds);

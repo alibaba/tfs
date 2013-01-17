@@ -94,7 +94,7 @@ namespace tfs
         typedef tbutil::Handle<CheckThreadHelper> CheckThreadHelperPtr;
       private:
         int keepalive_(common::BasePacket* message);
-        int keepalive_(int32_t& sleep_time, NsKeepAliveType& type, NsRuntimeGlobalInformation& ngi, const time_t now);
+        int keepalive_(int32_t& sleep_time, NsKeepAliveType& type, NsRuntimeGlobalInformation& ngi);
         void check_();
         bool check_vip_(const NsRuntimeGlobalInformation& ngi) const;
         int ns_role_establish_(NsRuntimeGlobalInformation& ngi, const time_t now);

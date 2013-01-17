@@ -87,9 +87,9 @@ namespace tfs
         int32_t block_count_;
         time_t last_update_time_;
         int64_t file_count_;
-        int32_t block_size_;
+        int64_t block_size_;
         int64_t delfile_count_;
-        int32_t block_del_size_;
+        int64_t block_del_size_;
         StatStruct();
         ~StatStruct();
 

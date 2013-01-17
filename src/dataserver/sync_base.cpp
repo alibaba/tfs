@@ -300,26 +300,29 @@ namespace tfs
 
     int SyncBase::do_sync(const char* data, const int32_t len)
     {
+      TIMER_START();
       if (NULL == data || len != sizeof(SyncData))
       {
         TBSYS_LOG(WARN, "SYNC_ERROR: data null or len error, %d <> %zd", len, sizeof(SyncData));
         return TFS_ERROR;
       }
       SyncData* sf = reinterpret_cast<SyncData*>(const_cast<char*>(data));
-      TBSYS_LOG(INFO, "sync_begin. block_id: %u, file_id: %"PRI64_PREFIX"u,action: %d",
+      TBSYS_LOG(DEBUG, "sync_begin. block_id: %u, file_id: %"PRI64_PREFIX"u,action: %d",
           sf->block_id_, sf->file_id_, sf->cmd_);
       int ret = backup_->do_sync(sf);
+      TIMER_END();
       if (TFS_SUCCESS == ret)
       {
-        TBSYS_LOG(INFO, "sync_ok. block_id: %u, file_id: %"PRI64_PREFIX"u,action: %d",
-            sf->block_id_, sf->file_id_, sf->cmd_);
+        TBSYS_LOG(INFO, "sync_ok. block_id: %u, file_id: %"PRI64_PREFIX"u,action: %d, cost: %"PRI64_PREFIX"d",
+            sf->block_id_, sf->file_id_, sf->cmd_, TIMER_DURATION());
       }
       else
       {
         // log to a file???
         FSName fsname(sf->block_id_, sf->file_id_);
-        TBSYS_LOG(ERROR, "sync_fail. block_id: %u, file_id: %"PRI64_PREFIX"u, action: %d, name:%s, ret: %d",
-            sf->block_id_, sf->file_id_, sf->cmd_, fsname.get_name(), ret);
+        TBSYS_LOG(ERROR, "sync_fail. block_id: %u, file_id: %"PRI64_PREFIX"u,"
+            "action: %d, ret: %d, name:%s, cost: %"PRI64_PREFIX"d",
+            sf->block_id_, sf->file_id_, sf->cmd_, ret, fsname.get_name(), TIMER_DURATION());
        }
 
       return TFS_SUCCESS;

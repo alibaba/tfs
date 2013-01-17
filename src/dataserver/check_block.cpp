@@ -40,12 +40,12 @@ namespace tfs
       {
         uint32_t mtime = time(NULL);
         changed_block_map_.insert(std::make_pair(block_id, mtime));
-        TBSYS_LOG(INFO, "add check task. block id: %u, modify time: %u", block_id, mtime);
+        TBSYS_LOG(DEBUG, "add check task. block id: %u, modify time: %u", block_id, mtime);
       }
       else
       {
         iter->second = time(NULL);
-        TBSYS_LOG(INFO, "update check task. block id: %u, modify time: %u",
+        TBSYS_LOG(DEBUG, "update check task. block id: %u, modify time: %u",
             iter->first, iter->second);
       }
       changed_block_mutex_.unlock();
@@ -129,7 +129,7 @@ namespace tfs
           result.total_size_ = bi.size_ - bi.del_size_;   // file size
         }
 
-        TBSYS_LOG(INFO, "blockid: %u, file count: %u, total size: %u",
+        TBSYS_LOG(DEBUG, "blockid: %u, file count: %u, total size: %u",
               result.block_id_, result.file_count_, result.total_size_);
       }
       return ret;

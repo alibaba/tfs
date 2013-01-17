@@ -382,6 +382,18 @@ namespace tfs
       return get_servers_(servers, pblock);
     }
 
+    int64_t BlockManager::get_servers_size(const BlockCollect* block) const
+    {
+      int64_t size = 0;
+      int32_t ret = NULL == block ? EXIT_NO_BLOCK : TFS_SUCCESS;
+      if (TFS_SUCCESS == ret)
+      {
+        RWLock::Lock lock(get_mutex_(block->id()), READ_LOCKER);
+        size = block->get_servers_size();
+      }
+      return size;
+    }
+
     RWLock& BlockManager::get_mutex_(const uint32_t block) const
     {
       return rwmutex_[get_chunk_(block)];
@@ -447,11 +459,6 @@ namespace tfs
 
           if (TFS_SUCCESS == ret)
           {
-            if (expire_self)
-            {
-              push_to_delete_queue(info.block_id_, server->id());
-            }
-
             ServerCollect* pserver = NULL;
             for (i = 0; i < other_expires.get_array_index(); ++i)
             {
@@ -466,7 +473,10 @@ namespace tfs
               assert(NULL != pserver);
               manager_.get_server_manager().relieve_relation(*helper.at(i), block);
             }
-            manager_.get_server_manager().build_relation(server, block, writable, master);
+            if (expire_self)
+              push_to_delete_queue(info.block_id_, server->id());
+            else
+              manager_.get_server_manager().build_relation(server, block, writable, master);
           }
         }
       }

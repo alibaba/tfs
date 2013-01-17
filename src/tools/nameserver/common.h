@@ -23,6 +23,7 @@
 #include "common/client_manager.h"
 #include "message/message_factory.h"
 #include "common/config_item.h"
+#include "nameserver/ns_define.h"
 
 namespace tfs
 {
@@ -111,10 +112,10 @@ namespace tfs
     struct ParamInfo
     {
       ParamInfo() :
-        type_(CMD_NOP), num_(MAX_READ_NUM), count_(1), interval_(2), filename_(""), block_id_(0), block_chunk_num_(512), server_ip_port_("")
+        type_(CMD_NOP), num_(MAX_READ_NUM), count_(1), interval_(2), filename_(""), block_id_(0), block_chunk_num_(nameserver::MAX_BLOCK_CHUNK_NUMS), server_ip_port_("")
       {}
       ParamInfo(const int8_t type) :
-        type_(type), num_(MAX_READ_NUM), count_(1), interval_(2), filename_(""), block_id_(0), block_chunk_num_(512), server_ip_port_("")
+        type_(type), num_(MAX_READ_NUM), count_(1), interval_(2), filename_(""), block_id_(0), block_chunk_num_(nameserver::MAX_BLOCK_CHUNK_NUMS), server_ip_port_("")
       {}
       ~ParamInfo(){}
       int8_t type_;

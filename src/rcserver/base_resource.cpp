@@ -319,10 +319,10 @@ namespace tfs
         out_rack_dat.cluster_data_.clear();
 
         std::vector<ClusterData>::const_iterator cluster_it = cluster_rack_it->cluster_data_.begin();
-        std::multimap<int32_t, std::vector<ClusterData>::const_iterator> sorted_helper;
+        std::multimap<uint32_t, std::vector<ClusterData>::const_iterator> sorted_helper;
         for (; cluster_it != cluster_rack_it->cluster_data_.end(); cluster_it++)
         {
-          int32_t distance = 0;
+          uint32_t distance = 0;
           std::string caculate_ns_ip;
           std::map<std::string, std::string>::const_iterator m_caculate_ip_it =
             m_ns_caculate_ip_.find(cluster_it->ns_vip_);
@@ -336,11 +336,11 @@ namespace tfs
             caculate_ns_ip = cluster_it->ns_vip_;
           }
           distance = IpReplaceHelper::calculate_distance(app_caculate_ip, caculate_ns_ip);
-          TBSYS_LOG(DEBUG, "ip %s %s distance %d",
+          TBSYS_LOG(DEBUG, "ip %s %s distance %u",
               app_caculate_ip.c_str(), caculate_ns_ip.c_str(), distance);
           sorted_helper.insert(std::make_pair(distance, cluster_it));
         }
-        std::multimap<int32_t, std::vector<ClusterData>::const_iterator>::const_iterator sorted_it;
+        std::multimap<uint32_t, std::vector<ClusterData>::const_iterator>::const_iterator sorted_it;
         for (sorted_it = sorted_helper.begin(); sorted_it != sorted_helper.end(); sorted_it++)
         {
           TBSYS_LOG(DEBUG, "cluster_data_  %s", (sorted_it->second)->ns_vip_.c_str());
@@ -349,15 +349,15 @@ namespace tfs
         out_base_info.cluster_infos_.push_back(out_rack_dat);
 
         VNsCacheInfo::const_iterator ns_cache_info_it = v_ns_cache_info_.begin();
-        int32_t distance = 0;
-        int32_t min_distance = -1;
+        uint32_t distance = 0;
+        uint32_t min_distance = 0xffffffff;  // server ip never be 255.255.255.255
         out_base_info.ns_cache_info_.clear();
         for (; ns_cache_info_it != v_ns_cache_info_.end(); ns_cache_info_it++)
         {
           distance = IpReplaceHelper::calculate_distance(app_caculate_ip, ns_cache_info_it->second);
-          TBSYS_LOG(DEBUG, "mindistance %d app_caculate_ip %s cache_caculate_ip %s distance %d",
+          TBSYS_LOG(DEBUG, "mindistance %d app_caculate_ip %s cache_caculate_ip %s distance %u",
               min_distance, app_caculate_ip.c_str(), ns_cache_info_it->second.c_str(), distance);
-          if (-1 == min_distance || distance < min_distance)
+          if (distance < min_distance)
           {
             min_distance = distance;
             out_base_info.ns_cache_info_ = ns_cache_info_it->first;

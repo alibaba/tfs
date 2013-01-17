@@ -53,6 +53,9 @@ namespace tfs
 
         int64_t get_app_id() const;
 
+        // for imgsrc tmp use
+        void set_remote_cache_info(const char * remote_cache_info);
+
         void set_wait_timeout(const int64_t timeout_ms);
         void set_log_level(const char* level);
         void set_log_file(const char* log_file);
@@ -82,6 +85,7 @@ namespace tfs
                        const char* file_name, const char* suffix = NULL);
         int fetch_buf(int64_t& ret_count, char* buf, const int64_t count,
                      const char* file_name, const char* suffix = NULL);
+
 
         // for name meta
         TfsRetType create_dir(const int64_t uid, const char* dir_path);
