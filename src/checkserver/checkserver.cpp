@@ -463,7 +463,7 @@ namespace tfs
           {
             work_threads[i]->start();
           }
-          catch (exception e)
+          catch (exception& e)
           {
             TBSYS_LOG(ERROR, "start thread exception: %s", e.what());
           }
@@ -475,7 +475,7 @@ namespace tfs
           {
             work_threads[i]->join();
           }
-          catch (exception e)
+          catch (exception& e)
           {
             TBSYS_LOG(ERROR, "join thread exception: %s", e.what());
           }

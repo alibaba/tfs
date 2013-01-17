@@ -98,7 +98,6 @@ namespace tfs
         run_plan_thread_ = new RunPlanThreadHelper(*this);
         add_block_in_all_server_thread_ = new AddBlockInAllServerThreadHelper(*this);
         check_dataserver_report_block_thread_ = new CheckDataServerReportBlockThreadHelper(*this);
-        run_plan_thread_ = new RunPlanThreadHelper(*this);
         balance_thread_  = new BuildBalanceThreadHelper(*this);
         timeout_thread_  = new TimeoutThreadHelper(*this);
         redundant_thread_= new RedundantThreadHelper(*this);
@@ -607,10 +606,16 @@ namespace tfs
         if (ngi.is_master())
         {
           while ((get_server_manager().has_report_block_server()) && (!ngi.is_destroyed()))
+          {
+            TBSYS_LOG(DEBUG, "HAS REPORT BLOCK SERVER: %"PRI64_PREFIX"d", get_server_manager().get_report_block_server_queue_size());
             usleep(1000);
+          }
 
           while (((need = has_space_in_task_queue_()) <= 0) && (!ngi.is_destroyed()))
+          {
+            TBSYS_LOG(DEBUG, "HAS SPACE IN TASK QUEUE: %"PRI64_PREFIX"d", need);
             usleep(1000);
+          }
 
           results.clear();
 
@@ -675,13 +680,23 @@ namespace tfs
         if (ngi.is_master())
         {
           while ((get_server_manager().has_report_block_server()) && (!ngi.is_destroyed()))
+          {
+            TBSYS_LOG(DEBUG, "HAS REPORT BLOCK SERVER: %"PRI64_PREFIX"d", get_server_manager().get_report_block_server_queue_size());
             usleep(1000);
+          }
 
           while ((get_block_manager().has_emergency_replicate_in_queue()) && (!ngi.is_destroyed()) && sleep_nums++ <= MAX_SLEEP_NUMS)
+          {
+            TBSYS_LOG(DEBUG, "HAS EMERGENCY REPLICATE IN QUEUE: %"PRI64_PREFIX"d, SLEEP NUM : %"PRI64_PREFIX"d",
+                get_block_manager().get_emergency_replicate_queue_size(), sleep_nums);
             usleep(1000);
+          }
 
           while (((need = has_space_in_task_queue_()) <= 0) && (!ngi.is_destroyed()))
+          {
+            TBSYS_LOG(DEBUG, "HAS SPACE IN TASK QUEUE: %"PRI64_PREFIX"d", need);
             usleep(1000);
+          }
 
           while ((!(plan_run_flag_ & PLAN_TYPE_MOVE)) && (!ngi.is_destroyed()))
             usleep(100000);
@@ -1186,12 +1201,10 @@ namespace tfs
           }
           GCObject* pobject = NULL;
           ret = !helper.empty() ? TFS_SUCCESS : EXIT_CHOOSE_CREATE_BLOCK_TARGET_SERVER_ERROR;
-          bool successful = TFS_SUCCESS == ret;
-          if (successful)//add block collect object successful
+          if (TFS_SUCCESS == ret)//add block collect object successful
           {
             ret = add_new_block_helper_send_msg_(block_id, helper);
-            successful = TFS_SUCCESS == ret;
-            if (successful)
+            if (TFS_SUCCESS == ret)
             {
               //build relation
               ret = add_new_block_helper_build_relation_(block, helper, now);
@@ -1201,7 +1214,7 @@ namespace tfs
               }
             }//end send message to dataserver successful
           }
-          if ((!successful)
+          if ((TFS_SUCCESS != ret)
               && (NULL != block)
               && (get_block_manager().get_servers_size(block) <= 0)
               && (new_create_block_collect || !block->is_creating()))

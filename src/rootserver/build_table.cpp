@@ -262,7 +262,6 @@ namespace tfs
     {
       int64_t i = 0;
       NEW_TABLE_ITER iter;
-      std::pair<NEW_TABLE_ITER, bool> res;
       std::set<uint64_t>::const_iterator it;
       for (i = 0; i < header_->bucket_item_ ; ++i)
       {
@@ -412,7 +411,7 @@ namespace tfs
       return iret;
     }
 
-    int64_t BuildTable::get_difference( int64_t& new_count, int64_t& old_count)
+    int64_t BuildTable::get_difference(int64_t& new_count, int64_t& old_count)
     {
       new_count = 0;
       old_count = 0;

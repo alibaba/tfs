@@ -102,6 +102,7 @@ namespace tfs
         /** handle packet*/
         virtual bool handlePacketQueue(tbnet::Packet *packet, void *args);
 
+        bool check_response(common::NewClient* client);
         int callback(common::NewClient* client);
 
         int post_message_to_server(common::BasePacket* message, const common::VUINT64& ds_list);

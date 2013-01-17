@@ -140,10 +140,11 @@ namespace tfs
     {
       //这里有可能会出现遗漏，这种状况可以通过下一次汇报来处理
       bool ret = false;
+      int32_t loop = delete_block_queue_.size();
       BlockCollect* block = NULL;
       ServerCollect* server = NULL;
       const int8_t MIN_REPLICATE = SYSPARAM_NAMESERVER.max_replication_ > 1 ? 2 : SYSPARAM_NAMESERVER.max_replication_;
-      while (pop_from_delete_queue_(output) && !ret)
+      while (!ret && loop--> 0 && pop_from_delete_queue_(output))
       {
         block = get(output.first);
         server = manager_.get_server_manager().get(output.second);

@@ -450,9 +450,9 @@ namespace tfs
       rd_message.set_offset(offset);
 
       int ret_status = TFS_SUCCESS;
-      NewClient* client = NewClientManager::get_instance().create_client();
       while (TFS_SUCCESS == ret_status)
       {
+        NewClient* client = NewClientManager::get_instance().create_client();
         tbnet::Packet* ret_msg = NULL;
         ret_status = send_msg_to_server(server_id, client, &rd_message, ret_msg);
         if (TFS_SUCCESS == ret_status && RESP_READ_DATA_MESSAGE != ret_msg->getPCode())
@@ -501,14 +501,15 @@ namespace tfs
         if (TFS_SUCCESS == ret_status)
         {
           offset += write_len;
-          read_len -= write_len;
+          read_len = MAX_READ_SIZE;
           rd_message.set_block_id(block_id);
           rd_message.set_file_id(file_id);
           rd_message.set_length(read_len);
           rd_message.set_offset(offset);
         }
+
+        NewClientManager::get_instance().destroy_client(client);
       }
-      NewClientManager::get_instance().destroy_client(client);
 
       if (ret_status == TFS_SUCCESS)
       {

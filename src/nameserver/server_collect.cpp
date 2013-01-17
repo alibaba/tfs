@@ -441,7 +441,7 @@ namespace tfs
 
     void ServerCollect::update(const common::DataServerStatInfo& info, const time_t now, const bool is_new)
     {
-      id_ = info.id_;
+      //id_ = info.id_;
       use_capacity_ = info.use_capacity_;
       total_capacity_ = info.total_capacity_;
       current_load_ = info.current_load_;

@@ -82,6 +82,7 @@ namespace tfs
       bool report_block_server_queue_empty() const;
       bool has_report_block_server() const;
       void clear_report_block_server_table();
+      int64_t get_report_block_server_queue_size() const;
 
       int get_alive_servers(std::vector<uint64_t>& servers) const;
       int get_dead_servers(common::ArrayHelper<uint64_t>& servers, NsGlobalStatisticsInfo& info, const time_t now) const;
@@ -131,6 +132,7 @@ namespace tfs
       bool get_range_servers_(common::ArrayHelper<ServerCollect*>& result, const uint64_t begin, const int32_t count) const;
 
       void move_split_servers_(std::multimap<int64_t, ServerCollect*>& source,
+          std::multimap<int64_t, ServerCollect*>& outside,
           SERVER_TABLE& targets, const ServerCollect* server, const double percent) const;
 
       int choose_writable_server_lock_(ServerCollect*& result);

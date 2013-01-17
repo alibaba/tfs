@@ -138,10 +138,10 @@ namespace tfs
 
       for (int i = 0; i < num; i++)
       {
-        tbsys::gDelete(namelist[i]);
+        tbsys::gFree(namelist[i]);
       }
 
-      tbsys::gDelete(namelist);
+      tbsys::gFree(namelist);
     }
 
     int BlockFileManager::bootstrap(const FileSystemParameter& fs_param)
@@ -1013,6 +1013,7 @@ namespace tfs
           {
             TBSYS_LOG(ERROR, "delete load conflict block. logic blockid: %u", logic_block_id);
             del_block(logic_block_id, C_CONFUSE_BLOCK);
+            conflict_flag = false;
             continue;
           }
 
@@ -1037,7 +1038,6 @@ namespace tfs
           }
         }
 
-        conflict_flag = false;
       }
 
       return ret;
@@ -1402,7 +1402,7 @@ namespace tfs
         ret = file_op->pwrite_file(zero_buf, wsize, bp_file_size - left);
         if (TFS_SUCCESS != ret)
         {
-          tbsys::gDelete(zero_buf);
+          tbsys::gDeleteA(zero_buf);
           tbsys::gDelete(file_op);
           tbsys::gDelete(file_formater);
           TBSYS_LOG(ERROR, "write block_prefix file error. ret: %d.", ret);

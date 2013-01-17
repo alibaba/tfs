@@ -74,10 +74,10 @@ namespace tfs
           TBSYS_LOG(ERROR, "%s", "rootserver not set ip_addr");
         }
       }
-      
+
       if (TFS_SUCCESS == iret)
       {
-        const char *dev_name = get_dev();                                                          
+        const char *dev_name = get_dev();
         if (NULL == dev_name)//get dev name
         {
           iret =  EXIT_CONFIG_ERROR;
@@ -156,7 +156,7 @@ namespace tfs
         update_tables_workers_.start();
       }
 
-      //initialize metaserver ==> rootserver heartbeat 
+      //initialize metaserver ==> rootserver heartbeat
       if (TFS_SUCCESS == iret)
       {
         int32_t heart_thread_count = TBSYS_CONFIG.getInt(CONF_SN_ROOTSERVER, CONF_HEART_THREAD_COUNT, 1);
@@ -236,7 +236,7 @@ namespace tfs
 
           if (bpacket->is_enable_dump())
           {
-            bpacket->dump(); 
+            bpacket->dump();
           }
           int32_t pcode = bpacket->getPCode();
           int32_t iret = common::TFS_ERROR;
@@ -331,10 +331,13 @@ namespace tfs
               NewClient::RESPONSE_MSG_MAP_ITER iter = sresponse->begin();
               for (; iter != sresponse->end(); ++iter)
               {
-                pmsg = dynamic_cast<UpdateTableResponseMessage*>(iter->second.second);
-                assert(NULL != pmsg);
-                manager_.update_tables_item_status(iter->second.first,
-                  pmsg->get_version(), pmsg->get_status(), pmsg->get_phase());
+                if (RSP_RT_UPDATE_TABLE_MESSAGE == (iter->second.second->getPCode()))
+                {
+                  pmsg = dynamic_cast<UpdateTableResponseMessage*>(iter->second.second);
+                  assert(NULL != pmsg);
+                  manager_.update_tables_item_status(iter->second.first,
+                    pmsg->get_version(), pmsg->get_status(), pmsg->get_phase());
+                }
               }
             }
           }
@@ -373,7 +376,7 @@ namespace tfs
         {
           uint32_t local_ip = 0;
           bool bfind_flag = false;
-          std::vector<uint32_t>::iterator iter = ip_list.begin(); 
+          std::vector<uint32_t>::iterator iter = ip_list.begin();
           for (; iter != ip_list.end(); ++iter)
           {
             bfind_flag = Func::is_local_addr((*iter));
@@ -423,7 +426,7 @@ namespace tfs
         {
           //receive all owner check message , master and slave heart message, dataserver heart message
           if (pcode != REQ_RT_RS_KEEPALIVE_MESSAGE
-            && pcode != REQ_RT_MS_KEEPALIVE_MESSAGE 
+            && pcode != REQ_RT_MS_KEEPALIVE_MESSAGE
             && pcode != HEARTBEAT_AND_NS_HEART_MESSAGE)
           {
             iret = ngi.info_.base_info_.status_ < RS_STATUS_INITIALIZED ? common::TFS_ERROR : common::TFS_SUCCESS;
@@ -552,7 +555,7 @@ namespace tfs
       {
         //if return TFS_SUCCESS, packet had been delete in this func
         //if handlePacketQueue return true, tbnet will delete this packet
-        assert(packet->getPCode() == REQ_RT_MS_KEEPALIVE_MESSAGE); 
+        assert(packet->getPCode() == REQ_RT_MS_KEEPALIVE_MESSAGE);
         manager_.ms_keepalive(dynamic_cast<BasePacket*>(packet));
       }
       return bret;

@@ -189,6 +189,8 @@ int GcWorker::get_expired_file(const char* path)
       check_file(path, dir_entry->d_name, now);
       dir_entry = readdir(dir);
     }
+
+    closedir(dir);
   }
   return ret;
 }

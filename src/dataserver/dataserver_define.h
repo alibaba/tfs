@@ -39,7 +39,7 @@ namespace tfs
     static const int32_t COPY_BETWEEN_CLUSTER = -1;
     static const int32_t BLOCK_VERSION_MAGIC_NUM = 2;
     // static const int32_t FS_SPEEDUP_VERSION = 2;
-    static const int32_t GC_WORKER_INTERVAL = 30;  // gc every 30 seconds
+    static const int32_t GC_WORKER_INTERVAL = 1800;  // gc every half an hour
 
     // fileinfo flag
     enum FileinfoFlag

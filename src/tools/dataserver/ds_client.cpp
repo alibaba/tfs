@@ -145,8 +145,8 @@ int main(int argc, char* argv[])
       return TFS_ERROR;
     }
   }
-  tfs::message::MessageFactory factory;
-  tfs::common::BasePacketStreamer streamer;
+  static tfs::message::MessageFactory factory;
+  static tfs::common::BasePacketStreamer streamer;
   streamer.set_packet_factory(&factory);
   NewClientManager::get_instance().initialize(&factory, &streamer);
 

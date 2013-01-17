@@ -59,7 +59,7 @@ namespace tfs
       bool operator != (const CacheDirMetaNode& right) const;
       bool is_got_all_children() const
       {
-        return 1 == flag_ & 0x01;
+        return 1 == (flag_ & 0x01);
       }
       void set_got_all_children()
       {

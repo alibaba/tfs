@@ -296,6 +296,21 @@ namespace tfs
     }
 #endif
 
+    void RcClientImpl::set_client_retry_count(const int64_t count)
+    {
+      TfsClientImpl::Instance()->set_client_retry_count(count);
+    }
+
+    int64_t RcClientImpl::get_client_retry_count() const
+    {
+      return TfsClientImpl::Instance()->get_client_retry_count();
+    }
+
+    void RcClientImpl::set_client_retry_flag(bool retry_flag)
+    {
+      TfsClientImpl::Instance()->set_client_retry_flag(retry_flag);
+    }
+
     void RcClientImpl::set_wait_timeout(const int64_t timeout_ms)
     {
       TfsClientImpl::Instance()->set_wait_timeout(timeout_ms);

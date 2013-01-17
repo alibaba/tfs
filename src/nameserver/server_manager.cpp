@@ -100,7 +100,6 @@ namespace tfs
 
     int ServerManager::remove(const uint64_t server, const time_t now)
     {
-      TBSYS_LOG(INFO, "dataserver: %s exit", tbsys::CNetUtil::addrToString(server).c_str());
       ServerCollect query(server);
       ServerCollect* object = NULL;
       rwmutex_.wrlock();
@@ -115,6 +114,8 @@ namespace tfs
 
       if (NULL != object)
       {
+        TBSYS_LOG(INFO, "dataserver: %s exit, now: %"PRI64_PREFIX"d, last_update_time: %"PRI64_PREFIX"d",
+            tbsys::CNetUtil::addrToString(server).c_str(), now, object->get_last_update_time());
         object->update_status();
         object->set_in_dead_queue_timeout(now);
 
@@ -268,6 +269,11 @@ namespace tfs
       current_reporting_block_servers_.clear();
     }
 
+    int64_t ServerManager::get_report_block_server_queue_size() const
+    {
+      return current_reporting_block_servers_.size() + wait_report_block_servers_.size();
+    }
+
     ServerCollect* ServerManager::get_(const uint64_t server) const
     {
       ServerCollect query(server);
@@ -362,6 +368,7 @@ namespace tfs
       ServerCollect* pserver = NULL;
       ServerCollect* servers[MAX_SLOT_NUMS];
       ArrayHelper<ServerCollect*> helper(MAX_SLOT_NUMS, servers);
+      std::multimap<int64_t, ServerCollect*> outside;
 
       do
       {
@@ -379,17 +386,23 @@ namespace tfs
               && manager_.get_task_manager().has_space_do_task_in_machine(pserver->id());
             if (has_move)
             {
-              move_split_servers_(source, targets, pserver, percent);
+              move_split_servers_(source, outside, targets, pserver, percent);
             }
           }
           server = pserver->id();
         }
       }
       while (!complete);
+
+      if (!targets.empty() && source.empty())
+      {
+        source = outside;
+      }
       return TFS_SUCCESS;
     }
 
     void ServerManager::move_split_servers_(std::multimap<int64_t, ServerCollect*>& source,
+        std::multimap<int64_t, ServerCollect*>& outside,
         SERVER_TABLE& targets, const ServerCollect* server, const double percent) const
     {
       if (NULL != server)
@@ -398,17 +411,22 @@ namespace tfs
         double current_percent = calc_capacity_percentage(server->use_capacity(), current_total_capacity);
         TBSYS_LOG(DEBUG, "move_split_server: %s, current_percent: %e, balance_percent: %e, percent: %e",
            tbsys::CNetUtil::addrToString(server->id()).c_str(), current_percent, SYSPARAM_NAMESERVER.balance_percent_, percent);
-        if ((current_percent > (percent + SYSPARAM_NAMESERVER.balance_percent_))
+        if (current_percent < percent - SYSPARAM_NAMESERVER.balance_percent_)
+        {
+          targets.insert(const_cast<ServerCollect*>(server));
+        }
+        else if ((current_percent > (percent + SYSPARAM_NAMESERVER.balance_percent_))
             || (current_percent >= 1.0))
         {
           source.insert(std::multimap<int64_t, ServerCollect*>::value_type(
                 static_cast<int64_t>(current_percent * PERCENTAGE_MAGIC), const_cast<ServerCollect*>(server)));
-        TBSYS_LOG(DEBUG, "move_split_server: %s, %ld",
+          TBSYS_LOG(DEBUG, "move_split_server: %s, %ld",
            tbsys::CNetUtil::addrToString(server->id()).c_str(), static_cast<int64_t>(current_percent * PERCENTAGE_MAGIC));
         }
-        if (current_percent < percent - SYSPARAM_NAMESERVER.balance_percent_)
+        else
         {
-          targets.insert(const_cast<ServerCollect*>(server));
+          outside.insert(std::multimap<int64_t, ServerCollect*>::value_type(
+                static_cast<int64_t>(current_percent * PERCENTAGE_MAGIC), const_cast<ServerCollect*>(server)));
         }
       }
     }
@@ -652,7 +670,7 @@ namespace tfs
     {
       result = NULL;
       SORT_MAP sorts;
-      GROUP_MAP group;
+      GROUP_MAP group, servers;
       ServerCollect* server = NULL;
       for (int32_t i = 0; i < sources.get_array_index(); ++i)
       {
@@ -663,7 +681,14 @@ namespace tfs
           int64_t use = static_cast<int64_t>(calc_capacity_percentage(server->use_capacity(),
                 server->total_capacity()) *  PERCENTAGE_MAGIC);
           sorts.insert(SORT_MAP::value_type(use, server));
+          uint32_t id  = server->id() & 0xFFFFFFFF;
           uint32_t lan = Func::get_lan(server->id(), SYSPARAM_NAMESERVER.group_mask_);
+          GROUP_MAP_ITER it   = servers.find(id);
+          if (servers.end() == it)
+          {
+            it = servers.insert(GROUP_MAP::value_type(id, SORT_MAP())).first;
+          }
+          it->second.insert(SORT_MAP::value_type(use, server));
           GROUP_MAP_ITER iter = group.find(lan);
           if (group.end() == iter)
           {
@@ -679,14 +704,23 @@ namespace tfs
       }
       else
       {
-        uint32_t nums = 0;
-        GROUP_MAP_ITER iter = group.begin();
-        for (; iter != group.end(); ++iter)
+        GROUP_MAP_ITER iter = servers.begin();
+        for (; servers.end() != iter && NULL == result; ++iter)
         {
-          if (iter->second.size() > nums)
-          {
-            nums = iter->second.size();
+          if (iter->second.size() > 1u)
             result = iter->second.rbegin()->second;
+        }
+        if (NULL == result)
+        {
+          uint32_t nums = 0;
+          iter = group.begin();
+          for (; iter != group.end(); ++iter)
+          {
+            if (iter->second.size() > nums)
+            {
+              nums = iter->second.size();
+              result = iter->second.rbegin()->second;
+            }
           }
         }
         if (NULL == result)
@@ -801,12 +835,14 @@ namespace tfs
             pblock = *helper.at(i);
             assert(NULL != pblock);
             manager_.get_block_manager().relieve_relation(pblock, server, now,BLOCK_COMPARE_SERVER_BY_POINTER);//pointer
-            manager_.get_server_manager().relieve_relation(server, pblock);
+            //manager_.get_server_manager().relieve_relation(server, pblock);
           }
-          /*if (!helper.empty())
+          if (!helper.empty())
           {
+            pblock = *helper.at(helper.get_array_index() - 1);
+            assert(NULL != pblock);
             begin = pblock->id();
-          }*/
+          }
         }
         while (!complete);
       }

@@ -186,21 +186,6 @@ namespace tfs
         sync_mirror_monitor_.unlock();
         if (NULL != item)
         {
-          if (is_master_ && !service_.sync_mirror_.empty())
-          {
-            std::vector<SyncBase*>::const_iterator iter = service_.sync_mirror_.begin();
-            // skip itself
-            iter++;
-            for (; iter != service_.sync_mirror_.end(); iter++)
-            {
-              SyncData* data = reinterpret_cast<SyncData*>(&item->data_[0]);
-              int8_t retry_count = 0;
-              do {
-                ret = (*iter)->write_sync_log(data->cmd_, data->block_id_, data->file_id_,
-                        data->old_file_id_);
-              }while (TFS_SUCCESS != ret && ++retry_count < 3);
-            }
-          }
           if (TFS_SUCCESS == do_sync(&item->data_[0], item->length_))
           {
             file_queue_->finish(0);

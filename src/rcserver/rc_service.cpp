@@ -52,7 +52,7 @@ namespace tfs
 
     bool RcService::handlePacketQueue(tbnet::Packet *packet, void *args)
     {
-      int ret = true;
+      int ret = TFS_SUCCESS;
       BasePacket* base_packet = NULL;
       if (!(ret = BaseService::handlePacketQueue(packet, args)))
       {
@@ -61,21 +61,28 @@ namespace tfs
       else
       {
         base_packet = dynamic_cast<BasePacket*>(packet);
-        switch (base_packet->getPCode())
+        if (!is_inited_)
         {
-          case REQ_RC_LOGIN_MESSAGE:
-            ret = req_login(base_packet);
-            break;
-          case REQ_RC_KEEPALIVE_MESSAGE:
-            ret = req_keep_alive(base_packet);
-            break;
-          case REQ_RC_LOGOUT_MESSAGE:
-            ret = req_logout(base_packet);
-            break;
-          default:
-            ret = EXIT_UNKNOWN_MSGTYPE;
-            TBSYS_LOG(ERROR, "unknown msg type: %d", base_packet->getPCode());
-            break;
+          ret = EXIT_NOT_INIT_ERROR;
+        }
+        else
+        {
+          switch (base_packet->getPCode())
+          {
+            case REQ_RC_LOGIN_MESSAGE:
+              ret = req_login(base_packet);
+              break;
+            case REQ_RC_KEEPALIVE_MESSAGE:
+              ret = req_keep_alive(base_packet);
+              break;
+            case REQ_RC_LOGOUT_MESSAGE:
+              ret = req_logout(base_packet);
+              break;
+            default:
+              ret = EXIT_UNKNOWN_MSGTYPE;
+              TBSYS_LOG(ERROR, "unknown msg type: %d", base_packet->getPCode());
+              break;
+          }
         }
       }
 
@@ -120,6 +127,10 @@ namespace tfs
             {
               TBSYS_LOG(ERROR, "call SessionManager::initialize fail. ret: %d", ret);
             }
+            else
+            {
+              is_inited_ = true;
+            }
             //TBSYS_LOG(INFO, "init ok ========");
           }
         }
@@ -131,6 +142,7 @@ namespace tfs
     int RcService::destroy_service()
     {
       int ret = TFS_SUCCESS;
+      is_inited_ = false;
       if (NULL != session_manager_)
         session_manager_->stop();
       if (NULL != resource_manager_)

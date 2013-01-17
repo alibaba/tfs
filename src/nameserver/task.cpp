@@ -533,7 +533,7 @@ namespace tfs
                 ret = manager_.get_manager().get_block_manager().get_servers_size(block) > 0 && result ?  STATUS_MESSAGE_REMOVE : STATUS_MESSAGE_OK;
                 if ((manager_.get_manager().get_block_manager().get_servers_size(block) <= 0) && (NULL != source))
                 {
-                  manager_.get_manager().build_relation(block, source, now, true);
+                  manager_.get_manager().build_relation(block, source, now);
                 }
               }
               else

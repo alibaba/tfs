@@ -595,6 +595,7 @@ namespace tfs
       sleep(heart_interval);
       while (!stop_)
       {
+        TIMER_START();
         if (who % 2 == 0)
         {
           data_management_.get_ds_filesystem_info(data_server_info_.block_count_, data_server_info_.use_capacity_,
@@ -622,6 +623,8 @@ namespace tfs
         {
           usleep(heart_interval * 1000000);
         }
+        TIMER_END();
+        TBSYS_LOG(DEBUG, "keppalive %s, cost time: %"PRI64_PREFIX"d", tbsys::CNetUtil::addrToString(hb_ip_port_[who]).c_str(),TIMER_DURATION());
       }
       return TFS_SUCCESS;
     }
@@ -759,20 +762,61 @@ namespace tfs
       return iret;
     }
 
+    bool DataService::check_response(common::NewClient* client)
+    {
+      bool all_success = (NULL != client);
+      NewClient::RESPONSE_MSG_MAP* sresponse = NULL;
+      NewClient::RESPONSE_MSG_MAP* fresponse = NULL;
+      if (all_success)
+      {
+        sresponse = client->get_success_response();
+        fresponse = client->get_fail_response();
+        all_success = ((NULL != sresponse) && (NULL != fresponse));
+      }
+
+      if (all_success)
+      {
+        all_success = (sresponse->size() == client->get_send_id_sign().size());
+        NewClient::RESPONSE_MSG_MAP::iterator iter = sresponse->begin();
+        for ( ; all_success && (iter != sresponse->end()); iter++)
+        {
+          tbnet::Packet* rmsg = iter->second.second;
+          if (NULL == rmsg)
+          {
+            all_success = false;
+          }
+          else
+          {
+            if (STATUS_MESSAGE != rmsg->getPCode())
+            {
+              all_success = false;
+            }
+            else
+            {
+              StatusMessage* smsg = dynamic_cast<StatusMessage*>(rmsg);
+              if (STATUS_MESSAGE_OK != smsg->get_status())
+              {
+                all_success = false;
+              }
+            }
+          }
+        }
+      }
+
+      return all_success;
+    }
+
     int DataService::callback(common::NewClient* client)
     {
       int32_t iret = NULL != client ? TFS_SUCCESS : TFS_ERROR;
       if (TFS_SUCCESS == iret)
       {
-        NewClient::RESPONSE_MSG_MAP* sresponse = client->get_success_response();
-        NewClient::RESPONSE_MSG_MAP* fresponse = client->get_fail_response();
-        iret = NULL != sresponse && fresponse != NULL ? TFS_SUCCESS : TFS_ERROR;
+        tbnet::Packet* packet = client->get_source_msg();
+        iret = (NULL != packet)? TFS_SUCCESS: TFS_ERROR;
         if (TFS_SUCCESS == iret)
         {
-          tbnet::Packet* packet = client->get_source_msg();
-          assert(NULL != packet);
+          bool all_success = check_response(client);
           int32_t pcode = packet->getPCode();
-          bool all_success = sresponse->size() == client->get_send_id_sign().size();
           common::BasePacket* bpacket= dynamic_cast<BasePacket*>(packet);
           if (WRITE_DATA_MESSAGE == pcode)
           {
@@ -821,7 +865,16 @@ namespace tfs
             {
               if (sync_mirror_.size() > 0)
               {
-                sync_mirror_.at(0)->write_sync_log(OPLOG_RENAME, block_id, new_file_id, file_id);
+                for (uint32_t i = 0; i < sync_mirror_.size(); i++)
+                {
+                  // ignore return value, just print error log for rename
+                  int tmp_ret = sync_mirror_.at(i)->write_sync_log(OPLOG_RENAME, block_id, new_file_id, file_id);
+                  if (TFS_SUCCESS != tmp_ret)
+                  {
+                    TBSYS_LOG(ERROR, " write sync log fail (id:%d), blockid: %u, fileid: %" PRI64_PREFIX "u, ret: %d",
+                      i, block_id, file_id, tmp_ret);
+                  }
+                }
               }
             }
             else if (!all_success)
@@ -868,8 +921,17 @@ namespace tfs
                   {
                     TBSYS_LOG(INFO, " write sync log, blockid: %u, fileid: %" PRI64_PREFIX "u", close_file_info.block_id_,
                         close_file_info.file_id_);
-                    iret = sync_mirror_.at(0)->write_sync_log(OPLOG_INSERT, close_file_info.block_id_,
-                        close_file_info.file_id_);
+                    for (uint32_t i = 0; i < sync_mirror_.size(); i++)
+                    {
+                      iret = sync_mirror_.at(i)->write_sync_log(OPLOG_INSERT, close_file_info.block_id_,
+                          close_file_info.file_id_);
+                      if (TFS_SUCCESS != iret)
+                      {
+                        TBSYS_LOG(ERROR, " write sync log fail (id:%d), blockid: %u, fileid: %" PRI64_PREFIX "u, ret: %d",
+                            i, close_file_info.block_id_, close_file_info.file_id_, iret);
+                        break;
+                      }
+                    }
                   }
                 }
               }
@@ -1118,7 +1180,7 @@ namespace tfs
 
       TIMER_END();
       TBSYS_LOG(INFO,
-          "create file %s. filenumber: %" PRI64_PREFIX "u, blockid: %u, fileid: %" PRI64_PREFIX "u, cost time: %" PRI64_PREFIX "d",
+          "create file %s. filenumber: %" PRI64_PREFIX "u, blockid: %u, fileid: %"PRI64_PREFIX"u, cost: %"PRI64_PREFIX"d",
           TFS_SUCCESS == ret ? "success" : "fail", file_number, block_id, file_id, TIMER_DURATION());
 
       if (TFS_SUCCESS != ret)
@@ -1331,8 +1393,17 @@ namespace tfs
                     {
                       TBSYS_LOG(INFO, " write sync log, blockid: %u, fileid: %" PRI64_PREFIX "u", close_file_info.block_id_,
                           close_file_info.file_id_);
-                      ret = sync_mirror_.at(0)->write_sync_log(OPLOG_INSERT, close_file_info.block_id_,
+                      for (uint32_t i = 0; i < sync_mirror_.size(); i++)
+                      {
+                        ret = sync_mirror_.at(i)->write_sync_log(OPLOG_INSERT, close_file_info.block_id_,
                           close_file_info.file_id_);
+                        if (TFS_SUCCESS != ret)
+                        {
+                          TBSYS_LOG(ERROR, " write sync log fail (id:%d), blockid: %u, fileid: %" PRI64_PREFIX "u, ret: %d",
+                              i, close_file_info.block_id_, close_file_info.file_id_, ret);
+                          break;
+                        }
+                      }
                     }
                   }
                 }
@@ -1801,7 +1872,18 @@ namespace tfs
           {
             TBSYS_LOG(DEBUG, "master dataserver: delete synclog. blockid: %d, fileid: %" PRI64_PREFIX "u, action: %d\n",
                 block_id, file_id, action);
-            sync_mirror_.at(0)->write_sync_log(OPLOG_REMOVE, block_id, file_id, action);
+            {
+              for (uint32_t i = 0; i < sync_mirror_.size(); i++)
+              {
+                // ignore return value, just print error log for unlink
+                int tmp_ret = sync_mirror_.at(i)->write_sync_log(OPLOG_REMOVE, block_id, file_id, action);
+                if (TFS_SUCCESS != tmp_ret)
+                {
+                  TBSYS_LOG(ERROR, " write sync log fail (id:%d), blockid: %u, fileid: %" PRI64_PREFIX "u, ret: %d",
+                      i, block_id, file_id, tmp_ret);
+                }
+              }
+            }
           }
         }
       }

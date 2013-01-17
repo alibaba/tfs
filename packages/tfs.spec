@@ -65,6 +65,7 @@ rm  -f /etc/ld.so.conf.d/tfs-%{VERSION}.conf
 
 %files
 %defattr(0755, admin, admin)
+%{_prefix}
 %{_prefix}/bin
 %{_prefix}/lib
 %{_prefix}/conf

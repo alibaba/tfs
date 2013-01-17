@@ -353,6 +353,7 @@ namespace tfs
 
     int LogicBlock::read_file(const uint64_t inner_file_id, char* buf, int32_t& nbytes, const int32_t offset, const int8_t flag)
     {
+      ScopedRWLock scoped_lock(rw_lock_, READ_LOCKER);
       RawMeta file_meta;
       // 1. get file meta info(offset)
       int ret = index_handle_->read_segment_meta(inner_file_id, file_meta);
@@ -419,6 +420,7 @@ namespace tfs
 
     int LogicBlock::read_file_info(const uint64_t inner_file_id, FileInfo& finfo)
     {
+      ScopedRWLock scoped_lock(rw_lock_, READ_LOCKER);
       RawMeta file_meta;
       // 1. get file meta info
       int ret = index_handle_->read_segment_meta(inner_file_id, file_meta);

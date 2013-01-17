@@ -839,7 +839,6 @@ namespace tfs
                 && pcode != BLOCK_COMPACT_COMPLETE_MESSAGE
                 && pcode != OPLOG_SYNC_MESSAGE
                 && pcode != GET_BLOCK_INFO_MESSAGE
-                && pcode != GET_BLOCK_INFO_MESSAGE
                 && pcode != SET_DATASERVER_MESSAGE
                 && pcode != REQ_REPORT_BLOCKS_TO_NS_MESSAGE
                 && pcode != BATCH_GET_BLOCK_INFO_MESSAGE

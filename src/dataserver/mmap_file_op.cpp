@@ -95,7 +95,7 @@ namespace tfs
 
     int MMapFileOperation::pread_file(char* buf, const int32_t size, const int64_t offset)
     {
-      if (is_mapped_ && (offset + size) >= map_file_->get_size())
+      if (is_mapped_ && (offset + size) > map_file_->get_size())
       {
         TBSYS_LOG(DEBUG, "mmap file pread, size: %d, offset: %" PRI64_PREFIX "d, map file size: %d. need remap",
             size, offset, map_file_->get_size());

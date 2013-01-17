@@ -1730,7 +1730,7 @@ int TfsFile::read_process_ex(int64_t& read_size, const InnerFilePhase read_file_
   {
     ret = process(read_file_phase);
     finish_read_process(ret, read_size);
-  } while (ret != TFS_SUCCESS && ClientConfig::client_retry_flag_ && --retry_count > 0);
+  } while (ret != TFS_SUCCESS && --retry_count > 0);
 
   return ret;
 }
@@ -1784,7 +1784,7 @@ int TfsFile::stat_process()
   do
   {
     ret = process(FILE_PHASE_STAT_FILE);
-  } while (TFS_SUCCESS != ret && ClientConfig::client_retry_flag_ && --retry_count > 0);
+  } while (TFS_SUCCESS != ret && --retry_count > 0);
 
   if (TFS_SUCCESS != ret)
   {

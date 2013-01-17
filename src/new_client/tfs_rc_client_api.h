@@ -56,6 +56,10 @@ namespace tfs
         // for imgsrc tmp use
         void set_remote_cache_info(const char * remote_cache_info);
 
+        void set_client_retry_count(const int64_t count);
+        int64_t get_client_retry_count() const;
+        void set_client_retry_flag(bool retry_flag = true);
+
         void set_wait_timeout(const int64_t timeout_ms);
         void set_log_level(const char* level);
         void set_log_file(const char* log_file);

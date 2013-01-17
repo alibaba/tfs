@@ -2,7 +2,7 @@ AM_CPPFLAGS =-I$(top_srcdir)/src\
 	     -I$(TBLIB_ROOT)/include/tbsys\
 	     -I$(TBLIB_ROOT)/include/tbnet
 
-AM_LDFLAGS=-lrt -lpthread -ldl
+AM_LDFLAGS=-lrt -lpthread -ldl -ljemalloc
 
 LDADD=$(top_builddir)/src/new_client/.libs/libtfsclient.a\
       $(top_builddir)/src/message/libtfsmessage.a\

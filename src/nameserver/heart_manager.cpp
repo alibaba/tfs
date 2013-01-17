@@ -170,7 +170,7 @@ namespace tfs
         }
         ret = message->reply(result_msg);
         time_t consume = (tbutil::Time::now() - begin).toMicroSeconds();
-        TBSYS_LOG(INFO, "dataserver: %s %s %s consume times: %"PRI64_PREFIX"d(us), ret: %d", CNetUtil::addrToString(ds_info.id_).c_str(),
+        TBSYS_LOG(DEBUG, "dataserver: %s %s %s consume times: %"PRI64_PREFIX"d(us), ret: %d", CNetUtil::addrToString(ds_info.id_).c_str(),
           DATASERVER_STATUS_DEAD == ds_info.status_ ? "exit" : DATASERVER_STATUS_ALIVE  == ds_info.status_ ? "keepalive" :
           "unknow", TFS_SUCCESS == ret ? "successful" : "failed", consume, ret);
       }

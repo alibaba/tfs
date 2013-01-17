@@ -28,7 +28,7 @@ namespace tfs
 {
   namespace rcserver
   {
-    const int ADDR_INFO_LEN = 64;
+    const int ADDR_INFO_LEN = 256;
     const int REM_LEN = 256;
     const int CLUSTER_ID_LEN = 8;
     const int APP_KEY_LEN = 256;

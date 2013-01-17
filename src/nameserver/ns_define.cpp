@@ -167,6 +167,7 @@ namespace tfs
           switch_time_  = now + common::SYSPARAM_NAMESERVER.safe_mode_time_;
           discard_newblk_safe_mode_time_ =  now + common::SYSPARAM_NAMESERVER.discard_newblk_safe_mode_time_;
         }
+        TBSYS_LOG(INFO, "i %s the master server, switch time: %"PRI64_PREFIX"d", owner_role_ == NS_ROLE_MASTER ? "am" : "am not", switch_time_);
       }
     }
 
