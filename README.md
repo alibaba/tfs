@@ -1,5 +1,6 @@
-Welcome to TFS! TFS is a distributed file system developed by Taobao.com.
+Welcome to TFS! 
 ===================================================================
+TFS is a distributed file system developed by Taobao.com.
 
 http://code.taobao.org/trac/tfs/wiki/ZhWikiStart
 
