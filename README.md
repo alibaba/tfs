@@ -9,8 +9,8 @@ TFS is mainly designed for small files less than 1MB in size. It adopts flat str
 
 Documents
 ---------
-* [Install](https://github.com/alibaba/tfs/blob/master/INSTALL.md)
-* [Deploy](https://github.com/alibaba/tfs/blob/master/DEPLOY.md)
+### [Install](https://github.com/alibaba/tfs/blob/master/INSTALL.md)
+### [Deploy](https://github.com/alibaba/tfs/blob/master/DEPLOY.md)
 
 Licence
 -------
