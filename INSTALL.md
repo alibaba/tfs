@@ -1,4 +1,3 @@
-
 安装依赖的软件包
 ----------------
 
@@ -109,12 +108,10 @@ TFS开源用户大都只使用TFS的基本功能，所以这个版本我们默�
     A: 你需要先安装zlib,用于压缩/解压缩。
     
 
-有问题或建议请直接留言，或微博@淘宝TFS。
-
  [1]: http://www.gnu.org/software/automake/#downloading
  [2]: http://www.gnu.org/software/libtool/
  [3]: http://cnswww.cns.cwru.edu/php/chet/readline/rltop.html#Availability
  [4]: http://zlib.net/
  [5]: http://sourceforge.net/projects/e2fsprogs/
  [6]: http://code.google.com/p/gperftools/downloads/list
- [7]: http://blog.yunnotes.net/?p=586
+ [7]: https://github.com/alibaba/tfs/edit/master/DEPLOY.md
