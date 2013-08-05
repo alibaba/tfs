@@ -135,8 +135,6 @@
 
 如果你想部署TFS Webservice服务，[TFS nginx模块][4]已经在github上开源。
 
-有问题或建议请直接留言，或微博@淘宝TFS。
-
  [1]: https://github.com/alibaba/tfs/edit/master/INSTALL.md
  [2]: http://e.hiphotos.baidu.com/album/s=550;q=90;c=xiangce,100,100/sign=36ba122263d0f703e2b295d938c12000/622762d0f703918f1c4579ff503d269759eec46b.jpg?referer=68835931359b033b759fc9ea2429&x=.jpg
  [3]: http://code.taobao.org/p/tfs/wiki/tools/
