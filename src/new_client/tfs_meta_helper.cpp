@@ -277,8 +277,9 @@ int NameMetaHelper::get_table(const uint64_t server_id,
   }
   else if (RSP_RT_GET_TABLE_MESSAGE == rsp->getPCode())
   {
+    uLongf tlen = 0;
     GetTableFromRtsResponseMessage* resp_msg = dynamic_cast<GetTableFromRtsResponseMessage*>(rsp);
-    ret = uncompress(reinterpret_cast<unsigned char*> (table_info), &table_length, (unsigned char*)resp_msg->get_table(), resp_msg->get_table_length());
+    ret = uncompress(reinterpret_cast<unsigned char*> (table_info), &tlen, (unsigned char*)resp_msg->get_table(), resp_msg->get_table_length());
     if (Z_OK != ret)
     {
       TBSYS_LOG(ERROR, "uncompress error: ret : %d, version: %"PRI64_PREFIX"d, dest length: %"PRI64_PREFIX"d, lenght: %"PRI64_PREFIX"d",
@@ -287,6 +288,7 @@ int NameMetaHelper::get_table(const uint64_t server_id,
     }
     else
     {
+      table_length = tlen;
       version_id = resp_msg->get_version();
       ret = TFS_SUCCESS;
     }

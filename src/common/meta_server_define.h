@@ -189,7 +189,7 @@ namespace tfs
     // MetaInfo or FragInfo return count once
     const int32_t MAX_OUT_INFO_COUNT = 500;
     const int32_t ROW_LIMIT = 500;
-    const int64_t MAX_READ_FRAG_SIZE = static_cast<int64_t>(1) << 63 - 1;
+    const int64_t MAX_READ_FRAG_SIZE = INT64_MAX;
 
   }
 }

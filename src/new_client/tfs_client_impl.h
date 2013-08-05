@@ -31,7 +31,7 @@ namespace tfs
   }
   namespace client
   {
-    class tbutil::Mutex;
+    // class tbutil::Mutex;
     class TfsFile;
     class TfsSession;
     class GcWorker;

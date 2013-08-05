@@ -167,7 +167,7 @@ namespace tfs
     {
       UPDATE_TABLE_PHASE_1 = 0,
       UPDATE_TABLE_PHASE_2 = 1
-    };
+    } UpdateTablePhase;
 
     struct NewTableItem
     {
