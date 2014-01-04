@@ -86,7 +86,7 @@ namespace tfs
       // roundup to 1M
       int32_t writeBlockSize = (int32_t)(((double) max_block_size * block_use_ratio) / 100);
       max_block_size_ = (writeBlockSize & 0xFFF00000) + 1024 * 1024;
-      max_block_size_ = std::max(max_block_size_, max_block_size);
+      max_block_size_ = std::min(max_block_size_, max_block_size);
 
       max_replication_ = TBSYS_CONFIG.getInt(CONF_SN_NAMESERVER, CONF_MAX_REPLICATION, 2);
 

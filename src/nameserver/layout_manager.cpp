@@ -1297,7 +1297,7 @@ namespace tfs
           if (NULL == source)
           {
             print_servers(helper, result);
-            TBSYS_LOG(INFO, "replicate block: %u cannot found source dataserver, %s", block->id(), result.c_str());
+            TBSYS_LOG(DEBUG, "replicate block: %u cannot found source dataserver, %s", block->id(), result.c_str());
           }
           else
           {
@@ -1305,7 +1305,7 @@ namespace tfs
             if (NULL == target)
             {
               print_servers(helper, result);
-              TBSYS_LOG(INFO, "replicate block: %u cannot found target dataserver, %s", block->id(), result.c_str());
+              TBSYS_LOG(DEBUG, "replicate block: %u cannot found target dataserver, %s", block->id(), result.c_str());
             }
           }
 
@@ -1361,7 +1361,7 @@ namespace tfs
           ret = helper.exist(const_cast<ServerCollect*>(source));
           if (!ret)
           {
-            TBSYS_LOG(INFO, "cannot choose move source server, block: %u, source: %s",
+            TBSYS_LOG(DEBUG, "cannot choose move source server, block: %u, source: %s",
                 block->id(), CNetUtil::addrToString(source->id()).c_str());
           }
           else
@@ -1371,7 +1371,7 @@ namespace tfs
             ret = NULL != result;
             if (!ret)
             {
-              TBSYS_LOG(INFO, "cannot choose move target server, block: %u, source: %s",
+              TBSYS_LOG(DEBUG, "cannot choose move target server, block: %u, source: %s",
                   block->id(), CNetUtil::addrToString(source->id()).c_str());
             }
             else
