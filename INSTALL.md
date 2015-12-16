@@ -20,11 +20,12 @@
 *   uuid-devel 用于生成全局唯一ID 
     *   [下载源码安装][5]
     *   apt-get install uuid-dev
-    *   yum install e2fsprogs-devel.x86_64
+    *   yum install libuuid-devel.x86_64
 *   tcmalloc google的内存管理库 
     *   [下载源码安装][6]
     *   apt-get install libgoogle-perftools-dev
-    *   yum install google-perftools.x86_64
+    *   yum install epel-release.noarch
+    *   yum install gperftools.x86_64
 
 安装tb-common-utils
 -------------------
