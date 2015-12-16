@@ -8,16 +8,16 @@ Packager: taobao<opensource@taobao.com>
 License: GPL
 Vendor: TaoBao
 Prefix:%{_prefix}
-Source:%{NAME}-%{VERSION}.tar.gz
+Source:%{name}-%{version}.tar.gz
 BuildRoot: %{_tmppath}/%{name}-root
 
 BuildRequires: t-csrd-tbnet-devel >= 1.0.6
-BuildRequires: MySQL-devel-community = 5.1.48 
+BuildRequires: mysql-devel >= 5.1.48 
 BuildRequires: tair-devel >= 2.3 
 BuildRequires: boost-devel >= 1.3 
 BuildRequires: readline-devel
 BuildRequires: ncurses-devel
-BuildRequires: google-perftools >= 1.3 
+BuildRequires: gperftools >= 1.3 
 
 %define __os_install_post %{nil}
 %define debug_package %{nil}
