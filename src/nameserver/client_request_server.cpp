@@ -157,14 +157,14 @@ namespace tfs
         if (TFS_SUCCESS == ret)
           stat[0] = out.size();
         else
-          stat[1] = __gnu_cxx::abs(out.size() - blocks.size());
+          stat[1] = std::abs(ssize_t(out.size() - blocks.size()));
       }
       else
       {
         if (TFS_SUCCESS == ret)
           stat[2] = out.size();
         else
-          stat[3] = __gnu_cxx::abs(out.size() - block_count);
+          stat[3] = std::abs((long long)(out.size() - block_count));
       }
       GFactory::get_stat_mgr().update_entry(GFactory::tfs_ns_stat_, stat);
       return ret;
