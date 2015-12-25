@@ -9,9 +9,10 @@
     *   [下载源码安装][2]
     *   apt-get install libtool
     *   yum install libtool.x86_64
-*   realine 用于命令行编辑的库 
+*   realine, ncurses 用于命令行编辑的库 
     *   [下载源码安装][3]
     *   apt-get install libreadline-dev
+    *   apt-get install libncurses5-dev
     *   yum install readline-devel.x86_64
 *   libz-devel 用于数据压缩/解压缩 
     *   [下载源码安装][4]
