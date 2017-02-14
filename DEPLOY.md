@@ -1,11 +1,11 @@
-在成功[安装TFS][1]之后，在你的安装目录（默认为~/tfs_bin)，包含几个子目录bin、conf、include、lib、logs、script等。
+在成功[安装TFS][1]之后，在你的安装目录（默认为~/tfs_bin)，包含几个子目录bin、conf、include、lib、logs、scripts等。
 
 *   bin：包含tfs所有的可执行程序文件，如nameserver(NS)、dataserver(DS)、tfstool。
 *   conf：包含tfs的配置文件，如NS的配置文件ns.conf，DS的配置文件ds.conf。
 *   include：包含TFS客户端库相关的头文件，应用程序使用TFS需要包含这些头文件。
 *   lib： 包含TFS客户端的静/动态库，应用程序使用TFS需要连接libtfsclient。
 *   logs：用于存储TFS运行过程中的日志。
-*   script：包含tfs常用的一些运维脚本，如stfs用于格式化DS， tfs启动/停止NS、DS。
+*   scripts：包含tfs常用的一些运维脚本，如stfs用于格式化DS， tfs启动/停止NS、DS。
 
 本文介绍如何搭建TFS存储集群，以两台存储节点（4个DS进程）为例，部署拓扑图如下所示：
 
@@ -55,7 +55,7 @@
 --------------
 
     # cd ~/tfs_bin
-    # ./script/tfs start_ns  或者 ./bin/nameserver -f conf/ns.conf -d
+    # ./scripts/tfs start_ns  或者 ./bin/nameserver -f conf/ns.conf -d
     
 
 如果没有提示错误，则NS就已经在后台开始运行了，可通过ps查看相应进行，或进入logs下，查看nameserver.log，如包含“nameserver running”则说明启动正常
@@ -80,9 +80,9 @@
 在两台机器上，对数据目录进行format
 
     # cd ~/tfs_bin
-    # ./script/stfs format 1  // 结果会在命令行提示
-    # ./script/stfs format 2
-     以上两条命令也可合并为 ./script/stfs format 1-2 或 ./script/stfs format 1,2
+    # ./scripts/stfs format 1  // 结果会在命令行提示
+    # ./scripts/stfs format 2
+     以上两条命令也可合并为 ./scripts/stfs format 1-2 或 ./scripts/stfs format 1,2
      如果要清理格式化产生的数据，将上述命令中format换成clear即可
     
 
@@ -91,7 +91,7 @@
 在两台机器上，启动DS服务
 
     # cd ~/tfs_bin
-    # ./script/tfs start_ds 1-2  // 序号的使用与stfs类似，可通过","分隔序号，通过"-"指定范围序列
+    # ./scripts/tfs start_ds 1-2  // 序号的使用与stfs类似，可通过","分隔序号，通过"-"指定范围序列
       或./bin/dataserver -f conf/ds.conf -i 1 -d  (-i 指定序号）
     
 
