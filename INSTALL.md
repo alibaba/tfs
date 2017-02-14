@@ -116,4 +116,4 @@ TFS开源用户大都只使用TFS的基本功能，所以这个版本我们默�
  [4]: http://zlib.net/
  [5]: http://sourceforge.net/projects/e2fsprogs/
  [6]: http://code.google.com/p/gperftools/downloads/list
- [7]: https://github.com/alibaba/tfs/blob/master/DEPLOY.md
+ [7]: DEPLOY.md
