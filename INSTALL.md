@@ -40,8 +40,8 @@ TFS使用tb-common-utils软件包，tb-common-utils包含淘宝使用的基础�
 
 下载源码
 
-    # svn co -r 18 http://code.taobao.org/svn/tb-common-utils/trunk tb-common-utils
-    注意： 这里不要checkout最新版本，version18以后的修改导致部分接口不能前向兼容。
+    # svn export -r 18 http://code.taobao.org/svn/tb-common-utils/trunk tb-common-utils
+    注意： 这里不要导出最新版本，version18以后的修改导致部分接口不能前向兼容。
     
 
 编译安装
@@ -59,7 +59,7 @@ TFS开源用户大都只使用TFS的基本功能，所以这个版本我们默�
 
 下载源码
 
-    # svn co http://code.taobao.org/svn/tfs/branches/dev_for_outer_users tfs
+    # git clone https://github.com/alibaba/tfs.git
     
 
 编译安装
