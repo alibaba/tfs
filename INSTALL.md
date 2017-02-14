@@ -9,9 +9,10 @@
     *   [下载源码安装][2]
     *   apt-get install libtool
     *   yum install libtool.x86_64
-*   realine 用于命令行编辑的库 
+*   realine, ncurses 用于命令行编辑的库 
     *   [下载源码安装][3]
     *   apt-get install libreadline-dev
+    *   apt-get install libncurses5-dev
     *   yum install readline-devel.x86_64
 *   libz-devel 用于数据压缩/解压缩 
     *   [下载源码安装][4]
@@ -20,11 +21,12 @@
 *   uuid-devel 用于生成全局唯一ID 
     *   [下载源码安装][5]
     *   apt-get install uuid-dev
-    *   yum install e2fsprogs-devel.x86_64
+    *   yum install libuuid-devel.x86_64
 *   tcmalloc google的内存管理库 
     *   [下载源码安装][6]
     *   apt-get install libgoogle-perftools-dev
-    *   yum install google-perftools.x86_64
+    *   yum install epel-release.noarch
+    *   yum install gperftools.x86_64
 
 安装tb-common-utils
 -------------------
@@ -38,8 +40,8 @@ TFS使用tb-common-utils软件包，tb-common-utils包含淘宝使用的基础�
 
 下载源码
 
-    # svn co -r 18 http://code.taobao.org/svn/tb-common-utils/trunk tb-common-utils
-    注意： 这里不要checkout最新版本，version18以后的修改导致部分接口不能前向兼容。
+    # svn export -r 18 http://code.taobao.org/svn/tb-common-utils/trunk tb-common-utils
+    注意： 这里不要导出最新版本，version18以后的修改导致部分接口不能前向兼容。
     
 
 编译安装
@@ -57,7 +59,7 @@ TFS开源用户大都只使用TFS的基本功能，所以这个版本我们默�
 
 下载源码
 
-    # svn co http://code.taobao.org/svn/tfs/branches/dev_for_outer_users tfs
+    # git clone https://github.com/alibaba/tfs.git
     
 
 编译安装
@@ -114,4 +116,4 @@ TFS开源用户大都只使用TFS的基本功能，所以这个版本我们默�
  [4]: http://zlib.net/
  [5]: http://sourceforge.net/projects/e2fsprogs/
  [6]: http://code.google.com/p/gperftools/downloads/list
- [7]: https://github.com/alibaba/tfs/blob/master/DEPLOY.md
+ [7]: DEPLOY.md
